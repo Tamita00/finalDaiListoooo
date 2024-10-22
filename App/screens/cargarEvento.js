@@ -258,64 +258,86 @@ const CargarEvento = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 10,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  modalButton: {
-    marginHorizontal: 10,
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
+      container: {
+      flex: 1,
+      padding: 40,
+      backgroundColor: '#fafafa',
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: '900',
+      marginBottom: 30,
+      color: '#2c3e50',
+      textAlign: 'center',
+    },
+    input: {
+      height: 50,
+      borderColor: '#3498db',
+      borderWidth: 2,
+      marginBottom: 15,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+      backgroundColor: '#ecf0f1',
+    },
+    picker: {
+      height: 60,
+      width: '100%',
+      marginBottom: 15,
+      borderWidth: 2,
+      borderColor: '#3498db',
+      borderRadius: 10,
+      backgroundColor: '#ecf0f1',
+    },
+    error: {
+      color: '#e74c3c',
+      marginBottom: 15,
+      fontSize: 16,
+      fontStyle: 'italic',
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    modalContent: {
+      width: '90%',
+      padding: 30,
+      backgroundColor: '#ffffff',
+      borderRadius: 15,
+      alignItems: 'center',
+      elevation: 10,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.5,
+      shadowRadius: 10,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: '600',
+      marginBottom: 20,
+      color: '#2980b9',
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      marginTop: 30,
+    },
+    modalButton: {
+      marginHorizontal: 20,
+      padding: 15,
+      backgroundColor: '#27ae60',
+      borderRadius: 8,
+    },
+    modalButtonText: {
+      color: '#ffffff',
+      fontSize: 18,
+      fontWeight: '500',
+    },
+  
+  
 });
 
 export default CargarEvento;

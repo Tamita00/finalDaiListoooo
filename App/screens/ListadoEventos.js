@@ -60,15 +60,26 @@ const ListadoEventos = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
+    backgroundColor: '#f8f9fa', // Fondo gris muy claro
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 28, // Tamaño de fuente más grande
+    fontWeight: '800', // Grosor de fuente más audaz
+    marginBottom: 15,
+    color: '#34495e', // Color oscuro para el encabezado
+    textAlign: 'center', // Centrar texto
   },
   event: {
-    marginBottom: 20,
+    marginBottom: 25, // Aumenté el margen inferior
+    padding: 15, // Añadido padding para separar del fondo
+    backgroundColor: '#ffffff', // Fondo blanco para cada evento
+    borderRadius: 10, // Bordes redondeados
+    shadowColor: '#000', // Color de sombra
+    shadowOffset: { width: 0, height: 3 }, // Desplazamiento de sombra
+    shadowOpacity: 0.2, // Opacidad de la sombra
+    shadowRadius: 5, // Difuminado de la sombra
+    elevation: 4, // Elevación para Android
   },
 });
 

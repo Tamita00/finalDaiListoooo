@@ -53,42 +53,49 @@ const Login = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    justifyContent: 'flex-start', // Cambié a inicio para un diseño más apilado
+    alignItems: 'stretch', // Alineación más amplia
+    backgroundColor: '#eaeef1', // Fondo gris claro
+    padding: 30, // Más espacio
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 30, // Tamaño de fuente más grande
+    fontWeight: '900', // Grosor de fuente más audaz
+    marginBottom: 30, // Mayor margen inferior
+    color: '#2c3e50', // Color oscuro para el título
+    textAlign: 'center', // Centrar texto
   },
   input: {
     width: '100%',
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    height: 50, // Aumenté la altura para un aspecto más cómodo
+    borderColor: '#3498db', // Color de borde azul
+    borderWidth: 2, // Grosor de borde más pronunciado
+    borderRadius: 8, // Bordes más redondeados
+    paddingHorizontal: 15, // Padding horizontal mayor
+    marginBottom: 20, // Mayor margen inferior
+    backgroundColor: '#ffffff', // Fondo blanco para el input
+    elevation: 2, // Elevación ligera para sombra
   },
   registerContainer: {
-    marginTop: 20,
+    marginTop: 30, // Mayor espacio superior
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // Centrar horizontalmente
   },
   registerText: {
     fontSize: 16,
-    color: '#666',
+    color: '#7f8c8d', // Color más suave para el texto
   },
   registerLink: {
     fontSize: 16,
-    color: '#007BFF',
+    color: '#27ae60', // Color verde para el enlace
     fontWeight: 'bold',
+    textDecorationLine: 'underline', // Subrayar el enlace
   },
   errorText: {
-    color: 'red',
-    marginTop: 10,
+    color: '#e74c3c', // Color rojo más vibrante
+    marginTop: 15, // Mayor margen superior
+    fontSize: 14, // Tamaño de fuente más pequeño
   },
 });
 

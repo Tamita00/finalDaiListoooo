@@ -88,56 +88,54 @@ const Home = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    justifyContent: 'flex-start', // Cambié a inicio para un diseño más apilado
+    alignItems: 'stretch', // Alineación más amplia
+    backgroundColor: '#ecf0f1', // Fondo gris claro
+    padding: 30, // Más espacio
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 32, // Tamaño de fuente más grande
+    fontWeight: '900', // Fuente más gruesa
+    marginBottom: 30, // Mayor margen inferior
+    color: '#2980b9', // Color azul
+    textAlign: 'center', // Centrar el texto
   },
   eventItem: {
-    padding: 10,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    padding: 15,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    borderWidth: 1, // Añadí un borde
+    borderColor: '#bdc3c7', // Color del borde
+    elevation: 4, // Añadí elevación para un efecto de sombra
   },
   eventTitle: {
-    fontSize: 18,
+    fontSize: 20, // Aumenté el tamaño de la fuente
     fontWeight: 'bold',
+    color: '#2c3e50', // Color oscuro
   },
   eventDate: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16, // Tamaño de fuente más grande
+    color: '#7f8c8d', // Color más suave para la fecha
   },
   buttonContainer: {
-    marginTop: 20, // Ajusta el margen superior según sea necesario
-    marginBottom: 20, // Espacio en la parte inferior
-    alignSelf: 'center', // Centra el botón horizontalmente
-    position: 'relative', // Necesario para el posicionamiento del botón
+    marginTop: 30, // Mayor espacio superior
+    marginBottom: 30, // Mayor espacio inferior
+    alignSelf: 'center',
   },
   addButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#007BFF',
+    width: 70, // Aumenté el tamaño del botón
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#27ae60', // Color verde
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    elevation: 6, // Elevación más prominente
   },
   addButtonText: {
-    color: '#fff',
-    fontSize: 30,
+    color: '#ffffff',
+    fontSize: 34, // Aumenté el tamaño de la fuente del texto
     fontWeight: 'bold',
   },
 });

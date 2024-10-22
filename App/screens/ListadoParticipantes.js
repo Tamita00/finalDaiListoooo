@@ -33,12 +33,19 @@ const ListadoParticipantes = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 40, // Aumenté el padding para más espacio
+    backgroundColor: '#ffffff', // Fondo blanco para un aspecto limpio
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 32, // Tamaño de fuente más grande
+    fontWeight: '900', // Grosor de fuente más audaz
+    marginBottom: 20, // Aumenté el margen inferior
+    color: '#2980b9', // Color azul para el encabezado
+    textAlign: 'center', // Centrar texto
+    textTransform: 'uppercase', // Texto en mayúsculas
+    borderBottomWidth: 2, // Añadí un borde inferior
+    borderBottomColor: '#dcdcdc', // Color del borde
+    paddingBottom: 10, // Espacio adicional debajo del encabezado
   },
 });
 

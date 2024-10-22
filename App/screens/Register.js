@@ -90,27 +90,35 @@ const Register = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    justifyContent: 'flex-start', // Cambié a inicio para un diseño más apilado
+    alignItems: 'stretch', // Alineación más amplia
+    backgroundColor: '#e1e6ea', // Fondo gris claro
+    padding: 30, // Aumenté el padding
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 32, // Tamaño de fuente más grande
+    fontWeight: '800', // Grosor de fuente más audaz
+    marginBottom: 25, // Mayor margen inferior
+    color: '#34495e', // Color oscuro para el título
+    textAlign: 'center', // Centrar texto
   },
   input: {
     width: '100%',
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    height: 50, // Aumenté la altura para un aspecto más cómodo
+    borderColor: '#3498db', // Color de borde azul
+    borderWidth: 2, // Grosor de borde más pronunciado
+    borderRadius: 8, // Bordes más redondeados
+    paddingHorizontal: 15, // Padding horizontal mayor
+    marginBottom: 20, // Mayor margen inferior
+    backgroundColor: '#ffffff', // Fondo blanco para el input
+    elevation: 2, // Elevación ligera para sombra
   },
   backButton: {
-    marginTop: 15,
+    marginTop: 30, // Aumenté el margen superior
+    backgroundColor: '#e74c3c', // Color de fondo rojo para el botón
+    padding: 10, // Padding para un botón más cómodo
+    borderRadius: 5, // Bordes redondeados
+    alignItems: 'center', // Centrar el texto dentro del botón
   },
 });
 

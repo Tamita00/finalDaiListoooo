@@ -62,18 +62,24 @@ const VisualizacionEventos = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    justifyContent: 'flex-start', // Cambié a inicio para un diseño más apilado
+    alignItems: 'center', // Mantengo la alineación centrada
+    padding: 30, // Aumenté el padding
+    backgroundColor: '#f4f4f4', // Fondo gris claro
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28, // Tamaño de fuente más grande
+    fontWeight: '900', // Grosor de fuente más audaz
+    marginBottom: 25, // Mayor margen inferior
+    color: '#2c3e50', // Color oscuro para el título
+    textAlign: 'center', // Centrar texto
   },
   soldOut: {
-    fontSize: 18,
-    color: 'red',
+    fontSize: 20, // Aumenté el tamaño de la fuente
+    color: '#e74c3c', // Color rojo vibrante
+    fontWeight: 'bold', // Hacer el texto más audaz
+    textAlign: 'center', // Centrar texto
+    marginTop: 15, // Añadir margen superior
   },
 });
 

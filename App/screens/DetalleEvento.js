@@ -48,12 +48,18 @@ const DetalleEvento = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
+    backgroundColor: '#f4f6f7', // Fondo claro
+    borderRadius: 15,
+    alignItems: 'center', // Centrar contenido
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 30, // Tamaño de fuente más grande
+    fontWeight: '900', // Fuente más gruesa
+    marginBottom: 20,
+    color: '#2c3e50', // Color oscuro para el título
+    textTransform: 'uppercase', // Texto en mayúsculas
+    textAlign: 'center', // Centrar texto
   },
 });
 
