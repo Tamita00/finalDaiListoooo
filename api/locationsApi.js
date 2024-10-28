@@ -1,14 +1,16 @@
 import apiManager from "./ApiManager";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-const get_Category = async () => {
+
+
+const get_Locations = async (token) => {
   const headers = {
     "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
     "ngrok-skip-browser-warning": true,  
   };
   const data = {}
   try {
     console.log
-    const result = await apiManager('Get', headers, data, 'event-category');
+    const result = await apiManager('Get', headers, data, 'event-location/getAll');
     console.log(result);
     return result;
   } catch (error) {
@@ -19,4 +21,4 @@ const get_Category = async () => {
 
 
 
-export default { get_Category};
+export default { get_Locations};

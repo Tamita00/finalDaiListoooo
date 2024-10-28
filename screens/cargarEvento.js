@@ -4,7 +4,8 @@ import categoryApi from '../api/categoryApi';
 import locationsApi from '../api/locationsApi';
 import eventsApi from '../api/eventsApi';
 
-const CargarEvento = ({ route }) => {
+
+const CargarEvento = ({ route, navigation }) => {
   const { token } = route.params;
   const [form, setForm] = useState({
     name: '',
@@ -17,17 +18,15 @@ const CargarEvento = ({ route }) => {
     enabled_for_enrollment: false,
     max_assistance: '',
     id_creator_user: '',
-    tags: [],
   });
 
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [errors, setErrors] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-  const [successModalVisible, setSuccessModalVisible] = useState(false); // New state for success modal
+  const [successModalVisible, setSuccessModalVisible] = useState(false); 
 
   useEffect(() => {
-    // Fetch categories
     const fetchCategories = async () => {
       try {
         const response = await categoryApi.get_Category();
@@ -37,7 +36,6 @@ const CargarEvento = ({ route }) => {
       }
     };
 
-    // Fetch locations
     const fetchLocations = async () => {
       try {
         const response = await locationsApi.get_Locations(token);
@@ -67,7 +65,7 @@ const CargarEvento = ({ route }) => {
     if (!form.price || isNaN(form.price) || form.price <= 0) newErrors.price = 'Price must be a positive number';
     if (!form.max_assistance || isNaN(form.max_assistance) || form.max_assistance <= 0)
       newErrors.max_assistance = 'Max assistance must be a positive number';
-    if (!form.id_creator_user || isNaN(form.id_creator_user)) newErrors.id_creator_user = 'Creator user ID is required';
+    if (!form.id_creator_user || isNaN(form.id_creator_user)) newErrors.id_creator_user = 'Creator user ID is required' ;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -75,17 +73,18 @@ const CargarEvento = ({ route }) => {
 
   const handleSubmit = async () => {
     if (validate()) {
-      // Show the modal instead of submitting directly
+
       setModalVisible(true);
     }
   };
 
   const handleConfirm = async () => {
     try {
+      console.log( typeof(form.id_creator_user))
       const response = await eventsApi.create_Events(form, token);
       console.log('Event creation response:', response);
       setModalVisible(false);
-      setSuccessModalVisible(true); // Show success modal
+      setSuccessModalVisible(true); 
     } catch (error) {
       console.error('Error creating event:', error);
       Alert.alert('Error', 'There was an error creating the event.');
@@ -98,11 +97,14 @@ const CargarEvento = ({ route }) => {
 
   const handleSuccessClose = () => {
     setSuccessModalVisible(false);
-    // Optionally, navigate away or reset the form here
   };
 
   return (
     <View style={styles.container}>
+     <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home", { token })}>
+  <Text style={styles.backButtonText}>Back</Text>
+</TouchableOpacity>
+
       <Text style={styles.title}>Event Form</Text>
 
       <Text>Name:</Text>
@@ -129,7 +131,7 @@ const CargarEvento = ({ route }) => {
       >
         <Picker.Item label="Select a category" value="" />
         {categories.map((category) => (
-          <Picker.Item key={category.id} label={category.name} value={category.id} />
+          <Picker.Item key={category.id} label={category.name} value={ parseInt(category.id)} />
         ))}
       </Picker>
       {errors.id_event_category && <Text style={styles.error}>{errors.id_event_category}</Text>}
@@ -161,7 +163,7 @@ const CargarEvento = ({ route }) => {
         style={styles.input}
         keyboardType="numeric"
         value={form.duration_in_minutes}
-        onChangeText={(text) => handleInputChange('duration_in_minutes', text)}
+        onChangeText={(text) => handleInputChange('duration_in_minutes',  text ? parseInt(text, 10) : '')}
       />
       {errors.duration_in_minutes && <Text style={styles.error}>{errors.duration_in_minutes}</Text>}
 
@@ -170,7 +172,7 @@ const CargarEvento = ({ route }) => {
         style={styles.input}
         keyboardType="numeric"
         value={form.price}
-        onChangeText={(text) => handleInputChange('price', text)}
+        onChangeText={(value) => handleInputChange('price',  value ? parseInt(value, 10) : '')}
       />
       {errors.price && <Text style={styles.error}>{errors.price}</Text>}
 
@@ -185,7 +187,7 @@ const CargarEvento = ({ route }) => {
         style={styles.input}
         keyboardType="numeric"
         value={form.max_assistance}
-        onChangeText={(text) => handleInputChange('max_assistance', text)}
+        onChangeText={(value) => handleInputChange('max_assistance',  value ? parseInt(value, 10) : '' )}
       />
       {errors.max_assistance && <Text style={styles.error}>{errors.max_assistance}</Text>}
 
@@ -194,13 +196,11 @@ const CargarEvento = ({ route }) => {
         style={styles.input}
         keyboardType="numeric"
         value={form.id_creator_user}
-        onChangeText={(text) => handleInputChange('id_creator_user', text)}
+        onChangeText={(value) => handleInputChange('id_creator_user', value ? parseInt(value, 10) : '')}
       />
       {errors.id_creator_user && <Text style={styles.error}>{errors.id_creator_user}</Text>}
 
       <Button title="Submit" onPress={handleSubmit} />
-
-      {/* Modal for confirmation */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -232,8 +232,6 @@ const CargarEvento = ({ route }) => {
           </View>
         </View>
       </Modal>
-
-      {/* Modal for success */}
       <Modal
         visible={successModalVisible}
         transparent={true}
@@ -258,86 +256,77 @@ const CargarEvento = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-      container: {
-      flex: 1,
-      padding: 40,
-      backgroundColor: '#fafafa',
-    },
-    title: {
-      fontSize: 32,
-      fontWeight: '900',
-      marginBottom: 30,
-      color: '#2c3e50',
-      textAlign: 'center',
-    },
-    input: {
-      height: 50,
-      borderColor: '#3498db',
-      borderWidth: 2,
-      marginBottom: 15,
-      paddingHorizontal: 20,
-      borderRadius: 10,
-      backgroundColor: '#ecf0f1',
-    },
-    picker: {
-      height: 60,
-      width: '100%',
-      marginBottom: 15,
-      borderWidth: 2,
-      borderColor: '#3498db',
-      borderRadius: 10,
-      backgroundColor: '#ecf0f1',
-    },
-    error: {
-      color: '#e74c3c',
-      marginBottom: 15,
-      fontSize: 16,
-      fontStyle: 'italic',
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    },
-    modalContent: {
-      width: '90%',
-      padding: 30,
-      backgroundColor: '#ffffff',
-      borderRadius: 15,
-      alignItems: 'center',
-      elevation: 10,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 5,
-      },
-      shadowOpacity: 0.5,
-      shadowRadius: 10,
-    },
-    modalTitle: {
-      fontSize: 24,
-      fontWeight: '600',
-      marginBottom: 20,
-      color: '#2980b9',
-    },
-    modalButtons: {
-      flexDirection: 'row',
-      marginTop: 30,
-    },
-    modalButton: {
-      marginHorizontal: 20,
-      padding: 15,
-      backgroundColor: '#27ae60',
-      borderRadius: 8,
-    },
-    modalButtonText: {
-      color: '#ffffff',
-      fontSize: 18,
-      fontWeight: '500',
-    },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    marginBottom: 10,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  modalButton: {
+    marginHorizontal: 10,
+    padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  backButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 5,            
+    padding: 10,                
+    alignItems: 'center',       
+    marginBottom: 20,           
+  },
   
-  
+  backButtonText: {
+    color: 'white',             
+    fontSize: 16,               
+    fontWeight: 'bold',         
+  },
 });
 
 export default CargarEvento;

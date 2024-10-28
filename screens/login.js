@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import userApi from '../api/userApi';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -11,7 +11,8 @@ const Login = ({ navigation }) => {
     try {
       const result = await userApi.user_login(username, password);
       if (result.status === 200) {
-        const token = result.data.token; // Suponiendo que el token está en result.data.token
+        const token = result.data.token;
+        await AsyncStorage.setItem("storedToken",token)
         navigation.navigate('Home', { token });
       } else {
         Alert.alert('Error', 'Usuario o contraseña incorrecta');
@@ -53,49 +54,42 @@ const Login = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Cambié a inicio para un diseño más apilado
-    alignItems: 'stretch', // Alineación más amplia
-    backgroundColor: '#eaeef1', // Fondo gris claro
-    padding: 30, // Más espacio
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 20,
   },
   title: {
-    fontSize: 30, // Tamaño de fuente más grande
-    fontWeight: '900', // Grosor de fuente más audaz
-    marginBottom: 30, // Mayor margen inferior
-    color: '#2c3e50', // Color oscuro para el título
-    textAlign: 'center', // Centrar texto
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   input: {
     width: '100%',
-    height: 50, // Aumenté la altura para un aspecto más cómodo
-    borderColor: '#3498db', // Color de borde azul
-    borderWidth: 2, // Grosor de borde más pronunciado
-    borderRadius: 8, // Bordes más redondeados
-    paddingHorizontal: 15, // Padding horizontal mayor
-    marginBottom: 20, // Mayor margen inferior
-    backgroundColor: '#ffffff', // Fondo blanco para el input
-    elevation: 2, // Elevación ligera para sombra
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
   },
   registerContainer: {
-    marginTop: 30, // Mayor espacio superior
+    marginTop: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // Centrar horizontalmente
   },
   registerText: {
     fontSize: 16,
-    color: '#7f8c8d', // Color más suave para el texto
+    color: '#666',
   },
   registerLink: {
     fontSize: 16,
-    color: '#27ae60', // Color verde para el enlace
+    color: '#007BFF',
     fontWeight: 'bold',
-    textDecorationLine: 'underline', // Subrayar el enlace
   },
   errorText: {
-    color: '#e74c3c', // Color rojo más vibrante
-    marginTop: 15, // Mayor margen superior
-    fontSize: 14, // Tamaño de fuente más pequeño
+    color: 'red',
+    marginTop: 10,
   },
 });
 
