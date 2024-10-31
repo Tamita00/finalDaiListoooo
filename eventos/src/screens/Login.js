@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Alert } from 'react-native';
-import userApi from '../api/userApi'; // Asegúrate de importar tu API
+import userApi from '../api/userApi3'; // Asegúrate de importar tu API
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState('');
