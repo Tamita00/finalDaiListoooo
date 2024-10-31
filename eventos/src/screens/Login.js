@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Alert } from 'react-native';
-import axios from 'axios';
+import { View, TextInput, Button, Alert } from 'react-native';
+import userApi from '../api/userApi'; // Asegúrate de importar tu API
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -8,7 +8,12 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('/api/user/login', { username, password });
+      const response = await userApi.user_login(username, password);
+      
+      if (response.error) {
+        throw new Error(response.error); // Lanza error si hay un problema
+      }
+
       // Asume que el backend devuelve nombre y apellido
       navigation.navigate('Home', { nombre: response.data.nombre, apellido: response.data.apellido });
     } catch (error) {

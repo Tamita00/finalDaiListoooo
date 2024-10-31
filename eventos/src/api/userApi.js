@@ -1,68 +1,42 @@
 import apiManager from "./apiManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const user_login = async (Username,Password) => {
+
+const user_login = async (username, password) => {
   const headers = {
     "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": true,  
+    "ngrok-skip-browser-warning": true,
   };
-  const data =
-  {
-    username: Username,
-    password: Password,
-  }
+  const data = {
+    username,
+    password,
+  };
   try {
     const result = await apiManager('POST', headers, data, 'user/login');
-    console.log(result);
-    return result;
+    return result; // Devuelve el resultado para manejarlo en el componente
   } catch (error) {
     console.error('Error en la solicitud:', error);
-    return { error: error.message };
+    return { error: error.message }; // Maneja errores
   }
 };
 
-const ObtenerInfoJugador = async (token) => {
-  console.log('Token:', token);
-  const method = "POST";
+const RegisterUser = async (firstName, lastName, password, username) => {
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`,
-    "ngrok-skip-browser-warning": true,  
   };
-  const data = {};  
-  const path = "auth/Decode";  
-  
-  try {
-    const result = await apiManager(method, headers, data, path);
-    console.log('User info response:', result.data);  // Cambia result a result.data para acceder a los datos de la respuesta
-    return result.data;
-  } catch (error) {
-    console.error('Error en ObtenerInfoJugador:', error.message);
-    await AsyncStorage.removeItem('@AccessToken');
-    return { error: error.message };
-  }
-};
-const RegisterUser = async (firstName,lastName,Password,Username) =>
-{
-
-    const headers = {
-        "Content-Type": "application/json",
-    }
-
-    const data =
-  {
+  const data = {
     first_name: firstName,
     last_name: lastName,
-    username: Username,
-    password: Password,
-  }
+    username,
+    password,
+  };
   try {
     const result = await apiManager('POST', headers, data, 'user/register');
-    console.log(result);
-    return result;
+    return result; // Devuelve el resultado para manejarlo en el componente
   } catch (error) {
     console.error('Error en la solicitud:', error);
-    return { error: error.message };
+    return { error: error.message }; // Maneja errores
   }
-}
+};
 
-export default { user_login, ObtenerInfoJugador,RegisterUser};
+// Exporta las funciones para que puedan ser utilizadas en otros componentes
+export default { user_login, RegisterUser };
