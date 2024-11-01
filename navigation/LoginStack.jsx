@@ -2,22 +2,27 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../views/Login';
 import Register from '../views/Register';
 import Home from '../views/Home';
-import Index from '../views/Index';
 import Formulario from '../views/Formulario';
 import Confirmacion from '../views/Confirmacion';
 import DetalleEvento from '../views/DetalleEvento';
 import Panel from '../views/Panel';
 import DetalleEventoAdmin from '../views/DetalleEventoAdmin';
+import { useAuth } from '../views/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
-const LoginNavigation = ({ isSignedIn }) => {
+const LoginNavigation = () => {
+
+
+  const { isAuthenticated } = useAuth();
+
+
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-    {isSignedIn ? (
+    {isAuthenticated  ? (
       <>
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Panel" component={Panel} />
       </>
     ) : (

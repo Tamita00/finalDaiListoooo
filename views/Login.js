@@ -21,7 +21,7 @@ export default function Login() {
 
       if (user && user.token && user.username) {
         login(user.token, user.username); // Usar el contexto para iniciar sesión
-        navigation.navigate('Index');
+        navigation.navigate('Home');
       } else {
         alert('Credenciales incorrectas');
       }
@@ -32,24 +32,24 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inicio de Sesión</Text>
-      <View style={styles.inputContainer}>
+    <View >
+      <Text >Inicio de Sesión</Text>
+      <View >
         <TextInput
           placeholder="User"
           value={username}
           onChangeText={setUsername}
-          style={styles.input}
+          
         />
         <TextInput
           placeholder="Password"
           value={contrasena}
           onChangeText={setContrasena}
           secureTextEntry
-          style={styles.input}
+          
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        <TouchableOpacity  onPress={handleLogin}>
+          <Text >Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>
     </View>

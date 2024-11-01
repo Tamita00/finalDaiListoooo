@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useState, useReducer } from 'react';
 
 const AuthContext = createContext();
 
@@ -14,31 +14,46 @@ const authReducer = (state, action) => {
 };
 
 export const AuthProvider = ({ children }) => {
+
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [state, dispatch] = useReducer(authReducer, {
     userToken: null,
     username: null,
   });
 
-  const login = async (username, password) => {
-    const response = await fetch('http://localhost:5000', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-});
-
+  /*const login = async (token, username, password) => {
+    // Asegúrate de que la URL es correcta
+    const response = await fetch('http://localhost:5000', { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, username, password }),
+    });
+console.log(token, username, password );
     if (response.ok) {
-        const data = await response.json();
-        setUser(data); // Aquí puedes almacenar el token y otros datos del usuario
+      const data = await response.json();
+      // Almacena el token y el nombre de usuario en el estado global
+      dispatch({ type: 'LOGIN', token: data.token, username: data.username });
     } else {
-        throw new Error('Credenciales incorrectas');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Credenciales incorrectas');
     }
-};
+  };
 
-const logout = () => {
-    setUser(null); // Limpiar el estado al cerrar sesión
-};
+  const logout = () => {
+    dispatch({ type: 'LOGOUT' });
+  };
+*/
+
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
+
+
+
+
   return (
-    <AuthContext.Provider value={{ state, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
