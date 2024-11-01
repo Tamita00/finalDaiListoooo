@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AppNavegable",
-    "slug": "AppNavegable",
+    "name": "tp08-cargaEventos",
+    "slug": "tp08-cargaEventos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
