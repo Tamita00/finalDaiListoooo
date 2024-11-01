@@ -1,55 +1,56 @@
-// import { useState } from 'react';
-import {  useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import { postAuth } from './../authService';
 import React from 'react';
-import Title from '../components/Title';
-import Boton from '../components/Boton';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { postAuth } from './../authService';
 
 export default function Confirmacion() {
     const navigation = useNavigation();
     const route = useRoute(); 
-    const { eventoACrear, token, categories, locations, nombre_user, idUser  } = route.params;
-    let selectedCategory, selectedLocation;
+    const { eventoACrear, token, categories, locations, nombre_user } = route.params;
 
-    selectedCategory = categories.find((category) => category.id === eventoACrear.id_event_category);
-    selectedLocation = locations.find((location) => location.id === eventoACrear.id_event_location);
-    
+    const selectedCategory = categories.find(category => category.id === eventoACrear.id_event_category);
+    const selectedLocation = locations.find(location => location.id === eventoACrear.id_event_location);
+
     const guardarEvento = async () => {
-        if(eventoACrear === null){
-            console.error("Error al subir evento: ", error)
-        }else{
-            postAuth('event/', eventoACrear, token)
-            alert('Tu evento ha sido creado con éxito!')
-            navigation.navigate("Index", { nombre: nombre_user, token: token })
+        if (!eventoACrear) {
+            console.error("Error al subir evento");
+            return;
         }
+        await postAuth('event/', eventoACrear, token);
+        alert('Tu evento ha sido creado con éxito!');
+        navigation.navigate("Index", { nombre: nombre_user, token });
     };
 
     const eventoNuevo = {
         'Nombre': eventoACrear.name,
         'Descripción': eventoACrear.description,
-        'Categoría': selectedCategory ? selectedCategory.name : null,
-        'Localidad': selectedLocation ? selectedLocation.name : null,
+        'Categoría': selectedCategory ? selectedCategory.name : 'No disponible',
+        'Localidad': selectedLocation ? selectedLocation.name : 'No disponible',
         'Fecha inicio': eventoACrear.start_date,
         'Duración en minutos': eventoACrear.duration_in_minutes,
         'Precio': eventoACrear.price,
         'Asistencia máxima': eventoACrear.max_assistance,
     };
-    console.log(eventoNuevo);
 
     return (
-        <View style={[styles.boxShadow, styles.container]}>
-            
-            <Title text={"¿Querés publicar este evento?"}/>
+        <View style={styles.container}>
+            <Text style={styles.title}>¿Estás seguro?</Text>
             <View style={styles.datosEvento}>
                 {Object.entries(eventoNuevo).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
-                        <Text style={styles.text}>{`${key}: ${value}`}</Text>
+                        {`${key}: ${value}`}
                     </Text>
                 ))}
             </View>
-            <Boton style={styles.no} text={'No'} onPress={()=> navigation.navigate("Index", { nombre: nombre_user, token: token })}/>
-            <Boton style={styles.si} text={'Si'} onPress={guardarEvento}/> 
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.no} onPress={() => navigation.navigate("Index", { nombre: nombre_user, token })}>
+                    <Text style={styles.buttonText}>No</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.si} onPress={guardarEvento}>
+                    <Text style={styles.buttonText}>Sí</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -58,38 +59,54 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f0f0f0',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#333',
     },
     text: {
         fontSize: 16,
-        marginVertical: 4,
-        fontWeight: 'bold',
-        color: 'white'
+        marginVertical: 8,
+        fontWeight: '600',
+        color: '#333',
     },
     datosEvento: {
-        backgroundColor: 'rgb(0, 123, 255)',
-        borderRadius: '5%',
-        display: 'flex',
-        justifyContent: 'flex-start',
-        padding: 25,
-        shadowOffset: '1%'
-    }, 
-    boxShadow: {
-        shadowColor: "grey",
-        shadowOffset: {
-          width: 6,
-          height: 6,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-        elevation: 16,
-      },
-    no:{
-        borderColor: '#007BFF',
-        backgroundColor: 'transparent'
+        backgroundColor: '#007BFF',
+        borderRadius: 10,
+        padding: 20,
+        width: '100%',
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 6,
+        elevation: 5,
     },
-    si:{
-        backgroundColor:  '#007BFF'
-    }
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 20,
+    },
+    no: {
+        backgroundColor: 'transparent',
+        borderColor: '#007BFF',
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 10,
+    },
+    si: {
+        backgroundColor: '#007BFF',
+        borderRadius: 5,
+        padding: 10,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        textAlign: 'center',
+    },
 });
-

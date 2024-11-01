@@ -1,82 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
-import Boton from '../components/Boton';
-import BotonSecundario from '../components/BotonSecundario';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
+import AuthContext from './AuthContext'; // Importa el contexto
 
 export default function Index() {
     const navigation = useNavigation();
+    const { state, logout } = useAuth();
+
+
     const route = useRoute();
     const { nombre, token } = route.params;
     const [eventos, setEventos] = useState([]);
-    const [id, setId] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const { signOut } = useContext(AuthContext); // Usa el contexto
 
-    const getId = async () => {
-        const endpoint = 'user/username/' + nombre;
+
+    const handleLogout = () => {
+        logout(); // Cierra sesión
+        navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
+      };
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const userId = await getId(nombre, token);
+            setUserId(userId);
+            await fetchEventos(token);
+        };
+        fetchData();
+    }, [nombre, token]);
+
+    const getId = async (nombre, token) => {
+        const endpoint = `user/username/${nombre}`;
         const user = await getAuth(endpoint, token);
-        console.log('user ', user)
         return user.id;
     };
 
-    function isDateFuture(event) {
-        const hoy = new Date();
-        return new Date(event.start_date) > hoy;
-    }
-
-    const canAddAttendant = async (event) => {
-    {
-        const enlistados = await get('event/enrollment/' + event.id.toString());
-        return enlistados.length < event.maxAssistant;
-    }}
-
-    const fetchEventos = async () => {
+    const fetchEventos = async (token) => {
         try {
             const data = await getEventos(token);
             setEventos(data);
         } catch (error) {
-            console.error('Error al cargar los eventos:', error);
+            console.error('Error:', error);
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const userId = await getId();
-            setId(userId);
-            console.log('userID', userId)
-            await fetchEventos();
-        };
-        fetchData();
-    }, []);
+    const isDateFuture = (event) => new Date(event.start_date) > new Date();
+
+    const canAddAttendant = async (event) => {
+        const enlistados = await get(`event/enrollment/${event.id}`);
+        return enlistados.length < event.max_assistance;
+    };
+
+    const renderItem = async ({ item }) => {
+        const canJoin = await canAddAttendant(item);
+        return (
+            <View style={styles.eventContainer}>
+                <Text 
+                    style={styles.eventTitle} 
+                    onPress={() => navigation.navigate('DetalleEvento', { token, idUser: userId, idEvent: item.id })}>
+                    {item.name}
+                </Text>
+                <Text>{item.start_date}</Text>
+                <Text style={styles.attendantText}>
+                    {canJoin ? 'Únete' : 'No hay más entradas'}
+                </Text>
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity onPress={handleLogout}>
+                <Text>Cerrar sesión</Text>
+            </TouchableOpacity>
             <Text style={styles.title}>Próximos Eventos</Text>
             <FlatList
                 data={eventos.filter(isDateFuture)}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.eventContainer}>
-                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id })}>{item.name}</Text>
-                        {/* <Text style={styles.eventTitle} onPress={() => console.log('a ver este id: ', item.id)}> {item.name} </Text> */}
-                        <Text>{item.start_date}</Text>
-                        {canAddAttendant(item)
-                            ? <Text style={styles.attendantText}>Podes unirte</Text>
-                            : <Text style={styles.attendantText}>Entradas agotadas</Text>}
-                    </View>
-                )}
+                renderItem={renderItem}
                 contentContainerStyle={styles.listContainer}
-
             />
-            <Boton text={"Crear nuevo evento"} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })} />
-            {id === 92 || id === 50 ? (
-                <BotonSecundario text="Ver todos los eventos" onPress={() => navigation.navigate("Panel", { token: token })} />
-            ) : null}
+            <TouchableOpacity 
+                style={styles.button} 
+                onPress={() => navigation.navigate('Formulario', { token, idUser: userId, nombre_user: nombre })}>
+                <Text style={styles.buttonText}>Crear nuevo evento</Text>
+            </TouchableOpacity>
 
+            {(userId === 92 || userId === 50) && (
+                <TouchableOpacity 
+                    style={styles.secondaryButton} 
+                    onPress={() => navigation.navigate("Panel", { token })}>
+                    <Text style={styles.buttonText}>Ver todos los eventos</Text>
+                </TouchableOpacity>
+            )}
+
+            {/* Botón para cerrar sesión */}
+            <TouchableOpacity 
+                style={styles.logoutButton} 
+                onPress={() => {
+                    signOut(); // Llama a la función de cerrar sesión
+                    navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
+                }}>
+                <Text style={styles.buttonText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -91,12 +122,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: 'center',
     },
-    subtitle: {
-        fontSize: 16,
-        color: '#555',
-        marginBottom: 30,
-        textAlign: 'center',
-    },
     listContainer: {
         paddingBottom: 20,
     },
@@ -109,6 +134,21 @@ const styles = StyleSheet.create({
     },
     eventTitle: {
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    attendantText: {
+        marginTop: 5,
+        color: '#555',
+    },
+    logoutButton: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: '#FF3D00',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
         fontWeight: 'bold',
     },
 });

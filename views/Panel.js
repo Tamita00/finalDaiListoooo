@@ -1,39 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
-import Boton from '../components/Boton';
-import BotonSecundario from '../components/BotonSecundario';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getEventos, getAuth, get } from '../authService';
-
+import { getEventos } from '../authService';
 
 export default function Panel() {
     const navigation = useNavigation();
     const route = useRoute();
-    const [eventos, setEventos] = useState([]);
     const { token } = route.params;
-
-    function isDateFuture(event) {
-        const hoy = new Date();
-        return new Date(event.start_date) > hoy;
-    }
-
-    const fetchEventos = async () => {
-        try {
-            const data = await getEventos(token);
-            setEventos(data);
-            console.log(data[0]);
-        } catch (error) {
-            console.error('Error al cargar los eventos:', error);
-        }
-    };
+    const [eventos, setEventos] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchEventos();
+        const fetchEventos = async () => {
+            try {
+                const data = await getEventos(token);
+                setEventos(data);
+            } catch (error) {
+                console.error('Error al cargar los eventos:', error);
+            }
         };
-        fetchData();
-    }, []);
 
+        fetchEventos();
+    }, [token]);
+
+    const isDateFuture = (event) => new Date(event.start_date) > new Date();
+
+    const renderEventItem = ({ item }) => (
+        <View style={styles.eventContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id })}>
+                <Text style={styles.eventTitle}>{item.name}</Text>
+                <Text>{item.start_date}</Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -41,25 +39,15 @@ export default function Panel() {
             <FlatList
                 data={eventos.filter(isDateFuture)}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.eventContainer}>
-                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', {idEvent: item.id })}>{item.name}</Text>
-                        <Text>{item.start_date}</Text>
-                    </View>
-                )}
+                renderItem={renderEventItem}
                 contentContainerStyle={styles.listContainer}
                 style={styles.flatList}
             />
-            <Text style={styles.title}>Eventos pasados</Text>
+            <Text style={styles.title}>Eventos Pasados</Text>
             <FlatList
                 data={eventos.filter(event => !isDateFuture(event))}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.eventContainer}>
-                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id })}>{item.name}</Text>
-                        <Text>{item.start_date}</Text>
-                    </View>
-                )}
+                renderItem={renderEventItem}
                 contentContainerStyle={styles.listContainer}
                 style={styles.flatList}
             />
@@ -78,12 +66,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
         marginBottom: 10,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#555',
-        marginBottom: 30,
         textAlign: 'center',
     },
     listContainer: {
