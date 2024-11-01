@@ -21,7 +21,7 @@ export default function Login() {
 
       if (user && user.token && user.username) {
         login(user.token, user.username); // Usar el contexto para iniciar sesión
-        navigation.navigate('Home');
+        navigation.navigate('Index');
       } else {
         alert('Credenciales incorrectas');
       }

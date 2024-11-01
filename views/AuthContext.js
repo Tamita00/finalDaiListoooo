@@ -50,10 +50,10 @@ console.log(token, username, password );
   const logout = () => setIsAuthenticated(false);
 
 
-
+   
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, useAuth }}>
       {children}
     </AuthContext.Provider>
   );

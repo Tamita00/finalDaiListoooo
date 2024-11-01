@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -6,54 +7,42 @@ import AuthContext from './AuthContext'; // Importa el contexto
 
 export default function Index() {
     const navigation = useNavigation();
-    const { state, logout } = useAuth();
-
 
     const route = useRoute();
-    const { nombre, token } = route.params;
+    //const { nombre, token } = route.params;
     const [eventos, setEventos] = useState([]);
     const [userId, setUserId] = useState(null);
-    const { signOut } = useContext(AuthContext); // Usa el contexto
 
-
-    const handleLogout = () => {
-        logout(); // Cierra sesión
-        navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
-      };
-
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const userId = await getId(nombre, token);
-            setUserId(userId);
-            await fetchEventos(token);
-        };
-        fetchData();
-    }, [nombre, token]);
-
-    const getId = async (nombre, token) => {
-        const endpoint = `user/username/${nombre}`;
+    const getId = async () => {
+        const endpoint = 'user/username/' + nombre;
         const user = await getAuth(endpoint, token);
+        console.log('user ', user)
         return user.id;
     };
 
-    const fetchEventos = async (token) => {
+    function isDateFuture(event) {
+        const hoy = new Date();
+        return new Date(event.start_date) > hoy;
+    }
+
+    const canAddAttendant = async (event) => {
+    {
+        const enlistados = await get('event/enrollment/' + event.id.toString());
+        return enlistados.length < event.maxAssistant;
+    }}
+
+    const fetchEventos = async () => {
         try {
             const data = await getEventos(token);
             setEventos(data);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error al cargar los eventos:', error);
         }
     };
 
-    const isDateFuture = (event) => new Date(event.start_date) > new Date();
 
-    const canAddAttendant = async (event) => {
-        const enlistados = await get(`event/enrollment/${event.id}`);
-        return enlistados.length < event.max_assistance;
-    };
 
-    const renderItem = async ({ item }) => {
+const renderItem = async ({ item }) => {
         const canJoin = await canAddAttendant(item);
         return (
             <View style={styles.eventContainer}>
@@ -69,6 +58,18 @@ export default function Index() {
             </View>
         );
     };
+
+
+    const handleLogout = () => {
+        logout(); // Cierra sesión
+        navigation.navigate('Home'); // Navega a la pantalla de inicio de sesión
+      };
+        //const { signOut } = useContext(AuthContext); // Usa el contexto  -----> esto es para que el cerrar sesion ande
+
+
+
+
+
 
     return (
         <View style={styles.container}>
@@ -96,7 +97,7 @@ export default function Index() {
                 </TouchableOpacity>
             )}
 
-            {/* Botón para cerrar sesión */}
+           
             <TouchableOpacity 
                 style={styles.logoutButton} 
                 onPress={() => {
@@ -107,7 +108,10 @@ export default function Index() {
             </TouchableOpacity>
         </View>
     );
-}
+    };
+
+    
+
 
 const styles = StyleSheet.create({
     container: {
@@ -152,3 +156,4 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
+
