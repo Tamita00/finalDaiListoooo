@@ -20,7 +20,8 @@ export default function Login() {
       const user = await loginUser(credentials);
 
       if (user && user.token && user.username) {
-        login(user.token, user.username); // Usar el contexto para iniciar sesión
+        login(user.token, user.username);
+        pasarTokenuser(user.token, user.username); // Usar el contexto para iniciar sesión
         navigation.navigate('Index');
       } else {
         alert('Credenciales incorrectas');

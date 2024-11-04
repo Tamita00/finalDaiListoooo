@@ -3,18 +3,37 @@ import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
-import AuthContext from './AuthContext'; // Importa el contexto
+import {useAuth} from './AuthContext'; // Importa el contexto
 
 export default function Index() {
     const navigation = useNavigation();
 
     const route = useRoute();
-    //const { nombre, token } = route.params;
+    
+    console.log(route.params);
     const [eventos, setEventos] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [value, setValue] = useState(null);
+    const [token, setToken] = useState(null);
+    const [username, setUsername] = useState(null);
 
+
+    _retrieveData = async () => {
+        try {
+          setValue( await AsyncStorage.getItem(token, username) ) ;
+          if (value !== null) {
+            setToken( token ) ;
+            setUsername( username ) ;
+            console.log(value);
+          }
+        } catch (error) {
+          // Error retrieving data
+        }
+      };
+
+      
     const getId = async () => {
-        const endpoint = 'user/username/' + nombre;
+        const endpoint = 'user/username/' + username;
         const user = await getAuth(endpoint, token);
         console.log('user ', user)
         return user.id;
@@ -40,7 +59,10 @@ export default function Index() {
         }
     };
 
-
+    useEffect(() => {
+        
+        fetchEventos(); // Luego, obtenemos los eventos
+    }, [username, token]);
 
 const renderItem = async ({ item }) => {
         const canJoin = await canAddAttendant(item);

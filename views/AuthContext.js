@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useReducer } from 'react';
+import React, { AsyncStorage, createContext, useContext, useState, useReducer } from 'react';
 
 const AuthContext = createContext();
 
@@ -15,7 +15,6 @@ const authReducer = (state, action) => {
 
 export const AuthProvider = ({ children }) => {
 
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [state, dispatch] = useReducer(authReducer, {
@@ -23,34 +22,30 @@ export const AuthProvider = ({ children }) => {
     username: null,
   });
 
-  /*const login = async (token, username, password) => {
-    // Asegúrate de que la URL es correcta
-    const response = await fetch('http://localhost:5000', { 
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, username, password }),
-    });
-console.log(token, username, password );
-    if (response.ok) {
-      const data = await response.json();
-      // Almacena el token y el nombre de usuario en el estado global
-      dispatch({ type: 'LOGIN', token: data.token, username: data.username });
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Credenciales incorrectas');
-    }
+
+  
+
+  const login = (token, username) => {
+    dispatch({ type: 'LOGIN', token, username });
+    setIsAuthenticated(true);
   };
+
+  const pasarTokenuser = (pasarToken, pasarUsername);
+
+  const auth = {
+    token: pasarToken,
+    username: pasarUsername,
+  }
+
+  AsyncStorage.setItem("TOKEN_USERNAME", JSON.stringify(auth))
 
   const logout = () => {
     dispatch({ type: 'LOGOUT' });
+    setIsAuthenticated(false);
   };
-*/
-
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
 
 
-   
+ 
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, useAuth }}>
