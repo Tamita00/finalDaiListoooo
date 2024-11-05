@@ -1,6 +1,8 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import Boton from '../components/Boton';
 import React, { useState, useEffect } from 'react';
+import BotonSecundario from '../components/BotonSecundario';
 import { postAuth } from '../authService';
 import { getCategories, getLocations, getAuth } from '../authService';
 
@@ -9,17 +11,20 @@ export default function DetalleEvento() {
     const { idEvent, token, idUser, evento } = route.params;
     const navigation = useNavigation();
 
-    const [categories, setCategories] = useState([]);
-    const [locations, setLocations] = useState([]);
+    const [categories, setCategories ] = useState([]);
+    const [locations, setLocations]  = useState([]);
 
     const enroll = async () => {
         const endpoint = 'event/' + idEvent + '/enrollment';
         const enrollment = await postAuth(endpoint, evento, token);
         console.log('enrollment.data', enrollment.data);
-        alert('Te registraste exitosamente! :D');
-        navigation.navigate('Index', { token: token, idUser: idUser });
+        // if(enrollment.response.data == 'Ya te registraste para este evento antes.') //no se si está bien puesto pero no tira el alert :/
+        //     alert('No te podes registrar dos veces al mismo evento')
+        // else
+            alert('Te registraste exitosamente! :D')
+            navigation.navigate('Index', { token: token, idUser: idUser});
+            //return enrollment;
     }
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -43,11 +48,15 @@ export default function DetalleEvento() {
         fetchLocations();
     }, [token]);
 
+    console.log('id_event_category', evento.id_event_category);
+    console.log('categorías', categories); 
+    console.log('categorías sub id-event-category', categories[evento.id_event_category]); 
+
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida',
-        'Localidad': evento.id_event_location || 'Desconocida',
+        'Categoria': evento.id_event_category || 'Desconocida', //se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
+        'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -63,18 +72,14 @@ export default function DetalleEvento() {
                 ))}
             </View>
             <View>
-                <TouchableOpacity 
-                    style={styles.buttonSecondary} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
-                >
-                    <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.buttonPrimary} 
-                    onPress={enroll}
-                >
-                    <Text style={styles.buttonText}>Inscribirse</Text>
-                </TouchableOpacity>
+                <BotonSecundario 
+                    text={'Atrás'} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
+                />
+                <Boton 
+                    text={'Inscribirse'} 
+                    onPress={enroll} 
+                /> 
             </View>
         </View>
     );
@@ -84,13 +89,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff3e6', // Color de fondo suave, como un tono coral
+        backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
     },
     datosEvento: {
         width: '100%',
-        maxWidth: 600,
+        maxWidth: 600, // Máximo ancho para pantallas grandes
         padding: 15,
         backgroundColor: '#ffffff',
         borderRadius: 10,
@@ -103,30 +108,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 16,
-        color: '#4d4d4d', // Gris oscuro para mejor contraste
+        color: '#333',
         marginVertical: 5,
     },
-    buttonPrimary: {
-        backgroundColor: '#ff7043', // Color principal (naranja cálido)
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonSecondary: {
-        backgroundColor: '#ffab91', // Color secundario (naranja claro)
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    }
-});
+})

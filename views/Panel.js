@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import Boton from '../components/Boton';
+import BotonSecundario from '../components/BotonSecundario';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getEventos } from '../authService';
+import { getEventos, getAuth, get } from '../authService';
+
 
 export default function Panel() {
     const navigation = useNavigation();
@@ -9,13 +12,11 @@ export default function Panel() {
     const [eventos, setEventos] = useState([]);
     const { token } = route.params;
 
-    // Función para verificar si la fecha del evento es futura
     function isDateFuture(event) {
         const hoy = new Date();
         return new Date(event.start_date) > hoy;
     }
 
-    // Cargar los eventos desde el servidor
     const fetchEventos = async () => {
         try {
             const data = await getEventos(token);
@@ -32,40 +33,35 @@ export default function Panel() {
         fetchData();
     }, []);
 
+
     return (
         <View style={styles.container}>
-
-            {/* Eventos futuros */}
             <Text style={styles.title}>Próximos Eventos</Text>
-            <ScrollView contentContainerStyle={styles.cardsContainer}>
-                {eventos.filter(isDateFuture).map((item) => (
-                    <View key={item.id} style={styles.eventCard}>
-                        <Text 
-                            style={styles.eventTitle} 
-                            onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token })}
-                        >
-                            {item.name}
-                        </Text>
+            <FlatList
+                data={eventos.filter(isDateFuture)}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.eventContainer}>
+                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', {idEvent: item.id, evento: item, token: token })}>{item.name}</Text>
                         <Text>{item.start_date}</Text>
                     </View>
-                ))}
-            </ScrollView>
-
-            {/* Eventos pasados */}
-            <Text style={styles.title}>Eventos Pasados</Text>
-            <ScrollView contentContainerStyle={styles.cardsContainer}>
-                {eventos.filter(event => !isDateFuture(event)).map((item) => (
-                    <View key={item.id} style={styles.eventCard}>
-                        <Text 
-                            style={styles.eventTitle} 
-                            onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token })}
-                        >
-                            {item.name}
-                        </Text>
+                )}
+                contentContainerStyle={styles.listContainer}
+                style={styles.flatList}
+            />
+            <Text style={styles.title}>Eventos pasados</Text>
+            <FlatList
+                data={eventos.filter(event => !isDateFuture(event))}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.eventContainer}>
+                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token })}>{item.name}</Text>
                         <Text>{item.start_date}</Text>
                     </View>
-                ))}
-            </ScrollView>
+                )}
+                contentContainerStyle={styles.listContainer}
+                style={styles.flatList}
+            />
         </View>
     );
 }
@@ -80,27 +76,30 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 20,
+        marginBottom: 10,
         textAlign: 'center',
     },
-    cardsContainer: {
-        marginBottom: 20,
+    subtitle: {
+        fontSize: 16,
+        color: '#555',
+        marginBottom: 30,
+        textAlign: 'center',
     },
-    eventCard: {
-        backgroundColor: '#fff',
+    listContainer: {
+        paddingBottom: 20,
+    },
+    eventContainer: {
         padding: 15,
-        borderRadius: 10,
-        marginBottom: 15,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        marginBottom: 10,
+        elevation: 1,
     },
     eventTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#007BFF',
-        marginBottom: 5,
+    },
+    flatList: {
+        maxHeight: 200,
     },
 });

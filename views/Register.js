@@ -1,7 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import CustomTextInput from '../components/textInput';
+import { StyleSheet, Text, View } from 'react-native';
 import { registerUser } from '../authService';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import Boton from '../components/Boton';
+import Title from '../components/Title';
 
 export default function Register() {
     const [nombre, setNombre] = useState('');
@@ -24,61 +27,28 @@ export default function Register() {
         alert('Error al registrar');
       }
     }
-
     return (
       <View style={styles.container}>
-        {/* Título manual */}
-        <Text style={styles.title}>Registrate</Text>
-
+        <Title text={"Registrate"}/>
         <View style={styles.inputContainer}>
-          <TextInput 
-            style={styles.input}
-            placeholder="Nombre"
-            value={nombre}
-            onChangeText={setNombre}
-          />
-          <TextInput 
-            style={styles.input}
-            placeholder="Apellido"
-            value={apellido}
-            onChangeText={setApellido}
-          />
-          <TextInput 
-            style={styles.input}
-            placeholder="Usuario"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput 
-            style={styles.input}
-            placeholder="Contraseña"
-            value={contrasena}
-            onChangeText={setContrasena}
-            secureTextEntry
-          />
-          
-          {/* Botón estándar de React Native */}
-          <Button title="Registrarse" onPress={handleRegister} />
+          <CustomTextInput placeholder="Nombre" value={nombre} onChangeText={setNombre} style={styles.inputContainer} />
+          <CustomTextInput placeholder="Apellido" value={apellido} onChangeText={setApellido} style={styles.inputContainer} />
+          <CustomTextInput placeholder="Usuario" value={username} onChangeText={setUsername} style={styles.inputContainer} />
+          <CustomTextInput placeholder="Contraseña" value={contrasena} onChangeText={setContrasena} secureTextEntry style={styles.inputContainer} />
+          <Boton text="Registrarse" onPress={handleRegister} />
         </View>
       </View>
     );
-}
-
+  }
 const styles = StyleSheet.create({
   container: {
-    width: '80%',
+    width: '80%0',
     flex: 1,
     backgroundColor: '#F8F9FD',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     paddingTop: 50,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
   },
   inputContainer: {
     marginTop: 20,

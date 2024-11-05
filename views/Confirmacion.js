@@ -1,24 +1,27 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+// import { useState } from 'react';
+import {  useNavigation, useRoute } from '@react-navigation/native';
+import { StyleSheet, View, Text } from 'react-native';
 import { postAuth } from './../authService';
 import React from 'react';
+import Title from '../components/Title';
+import Boton from '../components/Boton';
 
 export default function Confirmacion() {
     const navigation = useNavigation();
     const route = useRoute(); 
-    const { eventoACrear, token, categories, locations, nombre_user } = route.params;
+    const { eventoACrear, token, categories, locations, nombre_user, idUser  } = route.params;
     let selectedCategory, selectedLocation;
 
     selectedCategory = categories.find((category) => category.id === eventoACrear.id_event_category);
     selectedLocation = locations.find((location) => location.id === eventoACrear.id_event_location);
     
     const guardarEvento = async () => {
-        if (eventoACrear === null) {
-            console.error("Error al subir evento: ", error);
-        } else {
-            postAuth('event/', eventoACrear, token);
-            alert('Tu evento ha sido creado con éxito!');
-            navigation.navigate("Index", { nombre: nombre_user, token: token });
+        if(eventoACrear === null){
+            console.error("Error al subir evento: ", error)
+        }else{
+            postAuth('event/', eventoACrear, token)
+            alert('Tu evento ha sido creado con éxito!')
+            navigation.navigate("Index", { nombre: nombre_user, token: token })
         }
     };
 
@@ -34,27 +37,18 @@ export default function Confirmacion() {
     };
 
     return (
-        <View style={styles.container}>
-            {/* Título */}
-            <Text style={styles.title}>¿Querés publicar este evento?</Text>
+        <View style={[styles.boxShadow, styles.container]}>
             
-            {/* Detalles del evento */}
+            <Title text={"¿Querés publicar este evento?"}/>
             <View style={styles.datosEvento}>
                 {Object.entries(eventoNuevo).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
-                        {`${key}: ${value}`}
+                        <Text style={styles.text}>{`${key}: ${value}`}</Text>
                     </Text>
                 ))}
             </View>
-            
-            {/* Botones */}
-            <TouchableOpacity style={[styles.button, styles.no]} onPress={() => navigation.navigate("Index", { nombre: nombre_user, token: token })}>
-                <Text style={styles.buttonText}>No</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.button, styles.si]} onPress={guardarEvento}>
-                <Text style={styles.buttonText}>Sí</Text>
-            </TouchableOpacity>
+            <Boton style={styles.no} text={'No'} onPress={()=> navigation.navigate("Index", { nombre: nombre_user, token: token })}/>
+            <Boton style={styles.si} text={'Si'} onPress={guardarEvento}/> 
         </View>
     );
 }
@@ -63,53 +57,38 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f4f4f4',  // Fondo neutro
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#333',  // Color oscuro
-        marginBottom: 20,
-        textAlign: 'center',
+        alignItems: 'center'
     },
     text: {
         fontSize: 16,
         marginVertical: 4,
         fontWeight: 'bold',
-        color: '#333',  // Color oscuro
+        color: 'white'
     },
     datosEvento: {
-        backgroundColor: '#fff',  // Fondo blanco para los detalles
-        borderRadius: 10,
-        padding: 20,
-        marginBottom: 30,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 6,  // Sombra en Android
+        backgroundColor: 'rgb(0, 123, 255)',
+        borderRadius: '5%',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        padding: 25,
+        shadowOffset: '1%'
+    }, 
+    boxShadow: {
+        shadowColor: "grey",
+        shadowOffset: {
+          width: 6,
+          height: 6,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
+        elevation: 16,
+      },
+    no:{
+        borderColor: '#007BFF',
+        backgroundColor: 'transparent'
     },
-    button: {
-        width: '100%',
-        paddingVertical: 15,
-        marginVertical: 10,
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    no: {
-        backgroundColor: '#e0e0e0',  // Gris claro para el botón de "No"
-        borderColor: '#ccc',
-        borderWidth: 1,
-    },
-    si: {
-        backgroundColor: '#28a745',  // Verde para el botón de "Sí"
-    },
-    buttonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
+    si:{
+        backgroundColor:  '#007BFF'
+    }
 });
+

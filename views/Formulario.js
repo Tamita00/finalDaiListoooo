@@ -1,26 +1,41 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TextInput, Picker, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import Boton from '../components/Boton';
+import Title from '../components/Title';
 import React, { useState, useEffect } from 'react';
-import { getCategories, getLocations } from '../authService';
+import CustomTextInput from '../components/textInput';
+import NumberInput from '../components/numberInput';
+import { Dropdown } from 'react-native-element-dropdown';
+import { getCategories, getLocations, postAuth } from '../authService';
+import DateInput from '../components/dateInput';
+import BotonSecundario from '../components/BotonSecundario';
 
 export default function Formulario() {
     const navigation = useNavigation();
-
-    const [nombre, setNombre] = useState("");
-    const [descripcion, setDescripcion] = useState("");
-    const [duracion, setDuracion] = useState("");
-    const [precio, setPrecio] = useState("");
-    const [asistenciaMax, setAsistenciaMax] = useState("");
-    const [eventDate, setEventDate] = useState("");
-
-    const [categories, setCategories] = useState([]);
-    const [locations, setLocations] = useState([]);
+    
+    const [ nombre, setNombre ] = useState("");
+    const [ descripcion, setDescripcion ] = useState("");
+    const [ duracion, setDuracion ] = useState("");
+    const [ precio, setPrecio ] = useState("");
+    const [ asistenciaMax, setAsistenciaMax ] = useState("");
+    // const [showDatePicker, setShowDatePicker] = useState(false);
+    const [ eventDate, setEventDate] = useState("");
+    
+    const [categories, setCategories ] = useState([]);
+    const [locations, setLocations]  = useState([]);
     const [idSelectedCategory, idSetSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-
+    
     const route = useRoute();
-    const { token, idUser, nombre_user } = route.params;
+    const { token, idUser, nombre_user } = route.params;  
     console.log(idUser);
+
+    const renderItem = (item) => (
+        <View style={styles.item}>
+        <Text style={styles.itemText}>{item.name}</Text>
+        <Text style={styles.itemDate}>{item.start_date}</Text>
+        </View>
+    );
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -31,7 +46,7 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
             }
         };
-
+    
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
@@ -40,12 +55,12 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
             }
         };
-
+    
         fetchCategories();
         fetchLocations();
     }, [token]);
 
-    function handleGuardar() {
+    function handleGuardar(){
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
@@ -57,86 +72,48 @@ export default function Formulario() {
             "enabled_for_enrollment": 1,
             'max_assistance': asistenciaMax,
             "id_creator_user": idUser
-        };
-        navigation.navigate('Confirmacion', { eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser });
+        }
+        navigation.navigate('Confirmacion', {eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser});
         console.log(eventoACrear);
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Crear un nuevo evento</Text>
-            <TextInput 
-                style={styles.input} 
-                placeholder="Nombre" 
-                value={nombre} 
-                onChangeText={setNombre} 
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Descripción" 
-                value={descripcion} 
-                onChangeText={setDescripcion} 
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Duración en minutos" 
-                value={duracion} 
-                onChangeText={setDuracion} 
-                keyboardType="numeric" 
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Precio" 
-                value={precio} 
-                onChangeText={setPrecio} 
-                keyboardType="numeric" 
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Asistencia máxima" 
-                value={asistenciaMax} 
-                onChangeText={setAsistenciaMax} 
-                keyboardType="numeric" 
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Fecha del evento (YYYY-MM-DD)" 
-                value={eventDate} 
-                onChangeText={setEventDate} 
-            />
-            
+            <Title text="Crear un nuevo evento" />
+            <CustomTextInput placeholder="Nombre" value={nombre} onChangeText={setNombre}/>
+            <CustomTextInput placeholder="Descripción" value={descripcion} onChangeText={setDescripcion}/>
+            <NumberInput placeholder="Duración en minutos" value={duracion} onChange={setDuracion}/>
+            <NumberInput placeholder="Precio" value={precio} onChange={setPrecio}/>
+            <NumberInput placeholder="Asistencia máxima" value={asistenciaMax} onChange={setAsistenciaMax}/>
+            <DateInput date={eventDate} setFecha={setEventDate}/>
             <View style={styles.dropdownContainer}>
-                <Picker
-                    selectedValue={idSelectedCategory}
-                    onValueChange={(itemValue) => idSetSelectedCategory(itemValue)}
-                    style={styles.picker}
-                >
-                    <Picker.Item label="Selecciona una categoría" value={null} />
-                    {categories.map((category) => (
-                        <Picker.Item key={category.id} label={category.name} value={category.id} />
-                    ))}
-                </Picker>
+                <Dropdown
+                    data={categories}
+                    labelField="name"
+                    valueField="id"
+                    placeholder="Categoría"
+                    value={idSelectedCategory}
+                    onChange={(item) => {
+                        idSetSelectedCategory(item.id);
+                    }}
+                    renderItem={(item) => renderItem(item)}
+                />
             </View>
-            
             <View style={styles.dropdownContainer}>
-                <Picker
-                    selectedValue={idSelectedLocation}
-                    onValueChange={(itemValue) => setIdSelectedLocation(itemValue)}
-                    style={styles.picker}
-                >
-                    <Picker.Item label="Selecciona una localidad" value={null} />
-                    {locations.map((location) => (
-                        <Picker.Item key={location.id} label={location.name} value={location.id} />
-                    ))}
-                </Picker>
+                <Dropdown
+                    data={locations}
+                    labelField="name"
+                    valueField="id"
+                    placeholder="Localidad"
+                    value={idSelectedLocation}
+                    onChange={(item) => {
+                        setIdSelectedLocation(item.id);
+                    }}
+                    renderItem={(item) => renderItem(item)}
+                />
             </View>
-
-            <TouchableOpacity style={styles.buttonPrimary} onPress={handleGuardar}>
-                <Text style={styles.buttonText}>Guardar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Index', { token: token, id: idUser })}>
-                <Text style={styles.buttonText}>Atrás</Text>
-            </TouchableOpacity>
+            <Boton text={"Guardar"} onPress={handleGuardar} />
+            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Index', { token: token, id: idUser})}/>
         </View>
     );
 }
@@ -146,61 +123,56 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff6f1', // Color suave melón
+        backgroundColor: '#f5f5f5',
         padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333', // Gris oscuro
-        marginBottom: 20,
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginVertical: 8,
-        borderWidth: 1,
-        borderRadius: 5,
-        borderColor: '#ddd',
-        fontSize: 16,
-        backgroundColor: '#fff',
     },
     dropdownContainer: {
         width: '100%',
         backgroundColor: 'white',
-        borderWidth: 1,
-        borderColor: '#ddd',
+        borderWidth: 0,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 5,
+        borderRadius: 20,
         marginTop: 15,
+        shadowColor: '#0060DD',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3, 
+        shadowRadius: 10,
+        elevation: 5,
+        borderColor: 'transparent',
+        fontSize: 16
     },
-    picker: {
-        height: 50,
-        width: '100%',
-        backgroundColor: 'white',
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333', 
+        marginBottom: 20,
     },
-    buttonPrimary: {
-        backgroundColor: '#ff7043', // Naranja cálido
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
+    boton: {
+        backgroundColor: '#4CAF50', 
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 5,
+        elevation: 3, 
     },
-    buttonSecondary: {
-        backgroundColor: '#ffab91', // Naranja suave
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
+    botonText: {
         color: '#fff',
+        fontSize: 18,
+        textAlign: 'center',
+    },
+    item: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        backgroundColor: '#f9f9f9',
+    },
+    itemText: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: '#333',
+    },
+    itemDate: {
+        fontSize: 12,
+        color: '#666',
     },
 });

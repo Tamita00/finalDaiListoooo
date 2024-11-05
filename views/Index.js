@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import Boton from '../components/Boton';
+import BotonSecundario from '../components/BotonSecundario';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
 
@@ -22,9 +24,10 @@ export default function Index() {
     }
 
     const canAddAttendant = async (event) => {
+    {
         const enlistados = await get('event/enrollment/' + event.id.toString());
         return enlistados.length < event.maxAssistant;
-    };
+    }}
 
     const fetchEventos = async () => {
         try {
@@ -47,39 +50,31 @@ export default function Index() {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Próximos Eventos</Text>
-
-            {/* Usando ScrollView para hacer scrollable el listado de eventos */}
-            <ScrollView contentContainerStyle={styles.cardsContainer}>
-                {eventos.filter(isDateFuture).map((item) => (
-                    <View key={item.id} style={styles.card}>
-                        <Text
-                            style={styles.eventTitle}
-                            onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}
-                        >
-                            {item.name}
-                        </Text>
-                        <Text style={styles.eventDate}>{new Date(item.start_date).toLocaleString()}</Text>
-                        {canAddAttendant(item) ? (
-                            <Text style={styles.attendantText}>Puedes unirte</Text>
-                        ) : (
-                            <Text style={styles.attendantText}>Entradas agotadas</Text>
-                        )}
+            <FlatList
+                data={eventos.filter(isDateFuture)}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.eventContainer}>
+                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}>{item.name}</Text>
+                        {/* <Text style={styles.eventTitle} onPress={() => console.log('a ver este item.id: ', item.id)}> {item.name} </Text> */}
+                        <Text>{item.start_date}</Text>
+                        {canAddAttendant(item)
+                            ? <Text style={styles.attendantText}>Podes unirte</Text>
+                            : <Text style={styles.attendantText}>Entradas agotadas</Text>}
                     </View>
-                ))}
-            </ScrollView>
+                )}
+                contentContainerStyle={styles.listContainer}
 
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}>
-                <Text style={styles.buttonText}>Crear nuevo evento</Text>
-            </TouchableOpacity>
-
+            />
+            <Boton text={"Crear nuevo evento"} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })} />
             {id === 92 || id === 50 ? (
-                <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Panel', { token: token })}>
-                    <Text style={styles.buttonText}>Ver todos los eventos</Text>
-                </TouchableOpacity>
+            <BotonSecundario text="Ver todos los eventos" onPress={() => navigation.navigate("Panel", { token: token })} />
             ) : null}
+
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -91,60 +86,27 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 20,
+        marginBottom: 10,
         textAlign: 'center',
     },
-    cardsContainer: {
+    subtitle: {
+        fontSize: 16,
+        color: '#555',
+        marginBottom: 30,
+        textAlign: 'center',
+    },
+    listContainer: {
         paddingBottom: 20,
     },
-    card: {
-        backgroundColor: '#fff',
+    eventContainer: {
         padding: 15,
-        marginBottom: 15,
-        borderRadius: 10,
-        elevation: 5,
-        shadowColor: '#ccc',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        marginBottom: 10,
+        elevation: 1,
     },
     eventTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
-    },
-    eventDate: {
-        fontSize: 14,
-        color: '#777',
-        marginVertical: 5,
-    },
-    attendantText: {
-        fontSize: 14,
-        color: '#28a745',
-    },
-    button: {
-        backgroundColor: '#ff7043', // Naranja cálido
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    buttonSecondary: {
-        backgroundColor: '#007BFF', // Azul
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
     },
 });
