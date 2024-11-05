@@ -1,49 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getAuth } from './../authService';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { postAuth } from '../authService';
+import { getCategories, getLocations, getAuth } from '../authService';
 
 export default function DetalleEvento() {
     const route = useRoute();
-    const { idEvento, token, idUser } = route.params;
+    const { idEvent, token, idUser, evento } = route.params;
     const navigation = useNavigation();
-    const [event, setEvent] = useState(null);
+
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+
+    const enroll = async () => {
+        const endpoint = 'event/' + idEvent + '/enrollment';
+        const enrollment = await postAuth(endpoint, evento, token);
+        console.log('enrollment.data', enrollment.data);
+        alert('Te registraste exitosamente! :D');
+        navigation.navigate('Index', { token: token, idUser: idUser });
+    }
 
     useEffect(() => {
-        const fetchEvent = async () => {
-            const endpoint = `event/${idEvento}`;
-            const fetchedEvent = await getAuth(endpoint, token);
-            setEvent(fetchedEvent);
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories(token);
+                setCategories(data);
+            } catch (error) {
+                console.error('(UseEffect) Error al cargar las categorías:', error);
+            }
         };
-        fetchEvent();
-    }, [idEvento, token]);
+    
+        const fetchLocations = async () => {
+            try {
+                const data = await getLocations(token);
+                setLocations(data);
+            } catch (error) {
+                console.error('(UseEffect) Error al cargar las localidades:', error);
+            }
+        };
+    
+        fetchCategories();
+        fetchLocations();
+    }, [token]);
 
-    const enroll = () => {
-        alert('¿Deseas inscribirte en este evento?');
+    const displayData = {
+        'Nombre': evento.name,
+        'Descripcion': evento.description,
+        'Categoria': evento.id_event_category || 'Desconocida',
+        'Localidad': evento.id_event_location || 'Desconocida',
+        'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
+        'Duracion': `${evento.duration_in_minutes} minutos`,
+        'Precio': `$${evento.price}`
     };
 
     return (
         <View style={styles.container}>
-            {event ? (
-                <>
-                    <h1>{event.name}</h1>
-                    <h3>{event.description}</h3>
-                    <h3>Fecha: {event.date}</h3>
-                    <h3>Lugar: {event.location}</h3>
-                </>
-            ) : (
-                <h3>Cargando evento...</h3>
-            )}
-            <View style={styles.buttonContainer}>
-
-                <TouchableOpacity style={styles.no} onPress={() => navigation.navigate('Index', { token, id: idUser })}>
+            <View style={styles.datosEvento}>
+                {Object.entries(displayData).map(([key, value]) => (
+                    <Text key={key} style={styles.text}>
+                        {`${key}: ${value}`}
+                    </Text>
+                ))}
+            </View>
+            <View>
+                <TouchableOpacity 
+                    style={styles.buttonSecondary} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
+                >
                     <Text style={styles.buttonText}>Atrás</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.no} onPress={enroll}>
+                <TouchableOpacity 
+                    style={styles.buttonPrimary} 
+                    onPress={enroll}
+                >
                     <Text style={styles.buttonText}>Inscribirse</Text>
                 </TouchableOpacity>
-                
             </View>
         </View>
     );
@@ -53,29 +84,49 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        justifyContent: 'flex-start',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#fff3e6', // Color de fondo suave, como un tono coral
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    description: {
+    datosEvento: {
+        width: '100%',
+        maxWidth: 600,
+        padding: 15,
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 5,
+        marginBottom: 20,
+    },
+    text: {
         fontSize: 16,
-        color: '#333',
+        color: '#4d4d4d', // Gris oscuro para mejor contraste
+        marginVertical: 5,
+    },
+    buttonPrimary: {
+        backgroundColor: '#ff7043', // Color principal (naranja cálido)
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
         marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    details: {
-        fontSize: 14,
-        color: '#666',
-        marginVertical: 4,
+    buttonSecondary: {
+        backgroundColor: '#ffab91', // Color secundario (naranja claro)
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
-    },
-    secundario: {
-        flex: 1,
-        marginRight: 10,
-    },
-    principal: {
-        flex: 1,
-    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });

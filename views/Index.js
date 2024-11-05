@@ -1,41 +1,18 @@
-
-import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
-import {useAuth} from './AuthContext'; // Importa el contexto
 
 export default function Index() {
     const navigation = useNavigation();
-
     const route = useRoute();
-    
-    console.log(route.params);
+    const { nombre, token } = route.params;
     const [eventos, setEventos] = useState([]);
-    const [userId, setUserId] = useState(null);
-    const [value, setValue] = useState(null);
-    const [token, setToken] = useState(null);
-    const [username, setUsername] = useState(null);
+    const [id, setId] = useState(null);
 
-
-    _retrieveData = async () => {
-        try {
-          setValue( await AsyncStorage.getItem(token, username) ) ;
-          if (value !== null) {
-            setToken( token ) ;
-            setUsername( username ) ;
-            console.log(value);
-          }
-        } catch (error) {
-          // Error retrieving data
-        }
-      };
-
-      
     const getId = async () => {
-        const endpoint = 'user/username/' + username;
+        const endpoint = 'user/username/' + nombre;
         const user = await getAuth(endpoint, token);
-        console.log('user ', user)
         return user.id;
     };
 
@@ -45,10 +22,9 @@ export default function Index() {
     }
 
     const canAddAttendant = async (event) => {
-    {
         const enlistados = await get('event/enrollment/' + event.id.toString());
         return enlistados.length < event.maxAssistant;
-    }}
+    };
 
     const fetchEventos = async () => {
         try {
@@ -60,80 +36,50 @@ export default function Index() {
     };
 
     useEffect(() => {
-        
-        fetchEventos(); // Luego, obtenemos los eventos
-    }, [username, token]);
-
-const renderItem = async ({ item }) => {
-        const canJoin = await canAddAttendant(item);
-        return (
-            <View style={styles.eventContainer}>
-                <Text 
-                    style={styles.eventTitle} 
-                    onPress={() => navigation.navigate('DetalleEvento', { token, idUser: userId, idEvent: item.id })}>
-                    {item.name}
-                </Text>
-                <Text>{item.start_date}</Text>
-                <Text style={styles.attendantText}>
-                    {canJoin ? 'Únete' : 'No hay más entradas'}
-                </Text>
-            </View>
-        );
-    };
-
-
-    const handleLogout = () => {
-        logout(); // Cierra sesión
-        navigation.navigate('Home'); // Navega a la pantalla de inicio de sesión
-      };
-        //const { signOut } = useContext(AuthContext); // Usa el contexto  -----> esto es para que el cerrar sesion ande
-
-
-
-
-
+        const fetchData = async () => {
+            const userId = await getId();
+            setId(userId);
+            await fetchEventos();
+        };
+        fetchData();
+    }, []);
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={handleLogout}>
-                <Text>Cerrar sesión</Text>
-            </TouchableOpacity>
             <Text style={styles.title}>Próximos Eventos</Text>
-            <FlatList
-                data={eventos.filter(isDateFuture)}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-            />
-            <TouchableOpacity 
-                style={styles.button} 
-                onPress={() => navigation.navigate('Formulario', { token, idUser: userId, nombre_user: nombre })}>
+
+            {/* Usando ScrollView para hacer scrollable el listado de eventos */}
+            <ScrollView contentContainerStyle={styles.cardsContainer}>
+                {eventos.filter(isDateFuture).map((item) => (
+                    <View key={item.id} style={styles.card}>
+                        <Text
+                            style={styles.eventTitle}
+                            onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}
+                        >
+                            {item.name}
+                        </Text>
+                        <Text style={styles.eventDate}>{new Date(item.start_date).toLocaleString()}</Text>
+                        {canAddAttendant(item) ? (
+                            <Text style={styles.attendantText}>Puedes unirte</Text>
+                        ) : (
+                            <Text style={styles.attendantText}>Entradas agotadas</Text>
+                        )}
+                    </View>
+                ))}
+            </ScrollView>
+
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}>
                 <Text style={styles.buttonText}>Crear nuevo evento</Text>
             </TouchableOpacity>
 
-            {(userId === 92 || userId === 50) && (
-                <TouchableOpacity 
-                    style={styles.secondaryButton} 
-                    onPress={() => navigation.navigate("Panel", { token })}>
+            {id === 92 || id === 50 ? (
+                <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Panel', { token: token })}>
                     <Text style={styles.buttonText}>Ver todos los eventos</Text>
                 </TouchableOpacity>
-            )}
-
-           
-            <TouchableOpacity 
-                style={styles.logoutButton} 
-                onPress={() => {
-                    signOut(); // Llama a la función de cerrar sesión
-                    navigation.navigate('Login'); // Navega a la pantalla de inicio de sesión
-                }}>
-                <Text style={styles.buttonText}>Cerrar Sesión</Text>
-            </TouchableOpacity>
+            ) : null}
         </View>
     );
-    };
-
-    
-
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -145,37 +91,60 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 10,
+        marginBottom: 20,
         textAlign: 'center',
     },
-    listContainer: {
+    cardsContainer: {
         paddingBottom: 20,
     },
-    eventContainer: {
-        padding: 15,
+    card: {
         backgroundColor: '#fff',
-        borderRadius: 5,
-        marginBottom: 10,
-        elevation: 1,
+        padding: 15,
+        marginBottom: 15,
+        borderRadius: 10,
+        elevation: 5,
+        shadowColor: '#ccc',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
     },
     eventTitle: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#333',
+    },
+    eventDate: {
+        fontSize: 14,
+        color: '#777',
+        marginVertical: 5,
     },
     attendantText: {
-        marginTop: 5,
-        color: '#555',
+        fontSize: 14,
+        color: '#28a745',
     },
-    logoutButton: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#FF3D00',
-        borderRadius: 5,
+    button: {
+        backgroundColor: '#ff7043', // Naranja cálido
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 10,
         alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
     },
     buttonText: {
         color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
     },
+    buttonSecondary: {
+        backgroundColor: '#007BFF', // Azul
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+    },
 });
-

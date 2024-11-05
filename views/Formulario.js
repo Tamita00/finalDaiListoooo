@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Dropdown } from 'react-native-element-dropdown';
+import { StyleSheet, View, Text, TextInput, Picker, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { getCategories, getLocations } from '../authService';
 
 export default function Formulario() {
     const navigation = useNavigation();
-    const route = useRoute();
-    const { token, idUser, nombre_user } = route.params;
 
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
@@ -17,9 +14,13 @@ export default function Formulario() {
     const [eventDate, setEventDate] = useState("");
 
     const [categories, setCategories] = useState([]);
-    const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [locations, setLocations] = useState([]);
+    const [idSelectedCategory, idSetSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
+
+    const route = useRoute();
+    const { token, idUser, nombre_user } = route.params;
+    console.log(idUser);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -27,7 +28,7 @@ export default function Formulario() {
                 const data = await getCategories(token);
                 setCategories(data);
             } catch (error) {
-                console.error('Error al cargar las categorías:', error);
+                console.error('(UseEffect) Error al cargar las categorías:', error);
             }
         };
 
@@ -36,7 +37,7 @@ export default function Formulario() {
                 const data = await getLocations(token);
                 setLocations(data);
             } catch (error) {
-                console.error('Error al cargar las localidades:', error);
+                console.error('(UseEffect) Error al cargar las localidades:', error);
             }
         };
 
@@ -44,111 +45,96 @@ export default function Formulario() {
         fetchLocations();
     }, [token]);
 
-    const handleGuardar = () => {
+    function handleGuardar() {
         const eventoACrear = {
-            name: nombre,
-            description: descripcion,
-            id_event_category: idSelectedCategory,
-            id_event_location: idSelectedLocation,
-            start_date: eventDate,
-            duration_in_minutes: duracion,
-            price: precio,
-            enabled_for_enrollment: 1,
-            max_assistance: asistenciaMax,
-            id_creator_user: idUser,
+            'name': nombre,
+            'description': descripcion,
+            'id_event_category': idSelectedCategory,
+            'id_event_location': idSelectedLocation,
+            'start_date': eventDate,
+            'duration_in_minutes': duracion,
+            'price': precio,
+            "enabled_for_enrollment": 1,
+            'max_assistance': asistenciaMax,
+            "id_creator_user": idUser
         };
-        
-        navigation.navigate('Confirmacion', {
-            eventoACrear,
-            token,
-            categories,
-            locations,
-            nombre_user,
-            idUser,
-        });
+        navigation.navigate('Confirmacion', { eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser });
         console.log(eventoACrear);
-    };
+    }
 
     return (
         <View style={styles.container}>
-            <h1>Crear un nuevo evento</h1> 
-            
-            <TextInput
-            style={styles.input}
-            onChangeText={setNombre}
-            value={nombre}
-            placeholder="Nombre"
+            <Text style={styles.title}>Crear un nuevo evento</Text>
+            <TextInput 
+                style={styles.input} 
+                placeholder="Nombre" 
+                value={nombre} 
+                onChangeText={setNombre} 
             />
-
-import { TextInput } from 'react-native';
-
-// Replace your existing inputs with TextInput
-<TextInput
-    style={styles.input}
-    onChangeText={setDescripcion}
-    value={descripcion}
-    placeholder="Descripción"
-/>
-
-<TextInput
-    style={styles.input}
-    onChangeText={text => setDuracion(text)} // Adjusting to handle number input
-    value={duracion}
-    placeholder="Duración en minutos"
-    keyboardType="numeric" // Set keyboard type for number input
-/>
-
-<TextInput
-    style={styles.input}
-    onChangeText={text => setPrecio(text)} // Adjusting to handle number input
-    value={precio}
-    placeholder="Precio"
-    keyboardType="numeric" // Set keyboard type for number input
-/>
-
-<TextInput
-    style={styles.input}
-    onChangeText={text => setAsistenciaMax(text)} // Adjusting to handle number input
-    value={asistenciaMax}
-    placeholder="Asistencia máxima"
-    keyboardType="numeric" // Set keyboard type for number input
-/>
-
-<TextInput
-    style={styles.input}
-    onChangeText={text => {
-        setEventDate(text); // Update the date state
-    }}
-    value={eventDate}
-    placeholder="Fecha del evento"
-    // Optionally add a specific format, e.g., "YYYY-MM-DD"
-    keyboardType="default" // Change as needed for date entry
-/>
-
+            <TextInput 
+                style={styles.input} 
+                placeholder="Descripción" 
+                value={descripcion} 
+                onChangeText={setDescripcion} 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Duración en minutos" 
+                value={duracion} 
+                onChangeText={setDuracion} 
+                keyboardType="numeric" 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Precio" 
+                value={precio} 
+                onChangeText={setPrecio} 
+                keyboardType="numeric" 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Asistencia máxima" 
+                value={asistenciaMax} 
+                onChangeText={setAsistenciaMax} 
+                keyboardType="numeric" 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Fecha del evento (YYYY-MM-DD)" 
+                value={eventDate} 
+                onChangeText={setEventDate} 
+            />
+            
             <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={categories}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Categoría"
-                    value={idSelectedCategory}
-                    onChange={(item) => setIdSelectedCategory(item.id)}
-                />
+                <Picker
+                    selectedValue={idSelectedCategory}
+                    onValueChange={(itemValue) => idSetSelectedCategory(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Selecciona una categoría" value={null} />
+                    {categories.map((category) => (
+                        <Picker.Item key={category.id} label={category.name} value={category.id} />
+                    ))}
+                </Picker>
             </View>
+            
             <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={locations}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Localidad"
-                    value={idSelectedLocation}
-                    onChange={(item) => setIdSelectedLocation(item.id)}
-                />
+                <Picker
+                    selectedValue={idSelectedLocation}
+                    onValueChange={(itemValue) => setIdSelectedLocation(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Selecciona una localidad" value={null} />
+                    {locations.map((location) => (
+                        <Picker.Item key={location.id} label={location.name} value={location.id} />
+                    ))}
+                </Picker>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleGuardar}>
+
+            <TouchableOpacity style={styles.buttonPrimary} onPress={handleGuardar}>
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secundario} onPress={() => navigation.navigate('Index', { token, id: idUser })}>
+            <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Index', { token: token, id: idUser })}>
                 <Text style={styles.buttonText}>Atrás</Text>
             </TouchableOpacity>
         </View>
@@ -158,18 +144,63 @@ import { TextInput } from 'react-native';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff6f1', // Color suave melón
         padding: 20,
-        backgroundColor: '#f5f5f5',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333', // Gris oscuro
+        marginBottom: 20,
+    },
+    input: {
+        width: '100%',
+        padding: 10,
+        marginVertical: 8,
+        borderWidth: 1,
+        borderRadius: 5,
+        borderColor: '#ddd',
+        fontSize: 16,
+        backgroundColor: '#fff',
     },
     dropdownContainer: {
         width: '100%',
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
         marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-        elevation: 5,
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+        backgroundColor: 'white',
+    },
+    buttonPrimary: {
+        backgroundColor: '#ff7043', // Naranja cálido
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonSecondary: {
+        backgroundColor: '#ffab91', // Naranja suave
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

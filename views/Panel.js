@@ -1,56 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos } from '../authService';
 
 export default function Panel() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { token } = route.params;
     const [eventos, setEventos] = useState([]);
+    const { token } = route.params;
+
+    // Función para verificar si la fecha del evento es futura
+    function isDateFuture(event) {
+        const hoy = new Date();
+        return new Date(event.start_date) > hoy;
+    }
+
+    // Cargar los eventos desde el servidor
+    const fetchEventos = async () => {
+        try {
+            const data = await getEventos(token);
+            setEventos(data);
+        } catch (error) {
+            console.error('Error al cargar los eventos:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchEventos = async () => {
-            try {
-                const data = await getEventos(token);
-                setEventos(data);
-            } catch (error) {
-                console.error('Error al cargar los eventos:', error);
-            }
+        const fetchData = async () => {
+            await fetchEventos();
         };
-
-        fetchEventos();
-    }, [token]);
-
-    const isDateFuture = (event) => new Date(event.start_date) > new Date();
-
-    const renderEventItem = ({ item }) => (
-        <View style={styles.eventContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id })}>
-                <Text style={styles.eventTitle}>{item.name}</Text>
-                <Text>{item.start_date}</Text>
-            </TouchableOpacity>
-        </View>
-    );
+        fetchData();
+    }, []);
 
     return (
         <View style={styles.container}>
+
+            {/* Eventos futuros */}
             <Text style={styles.title}>Próximos Eventos</Text>
-            <FlatList
-                data={eventos.filter(isDateFuture)}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderEventItem}
-                contentContainerStyle={styles.listContainer}
-                style={styles.flatList}
-            />
+            <ScrollView contentContainerStyle={styles.cardsContainer}>
+                {eventos.filter(isDateFuture).map((item) => (
+                    <View key={item.id} style={styles.eventCard}>
+                        <Text 
+                            style={styles.eventTitle} 
+                            onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token })}
+                        >
+                            {item.name}
+                        </Text>
+                        <Text>{item.start_date}</Text>
+                    </View>
+                ))}
+            </ScrollView>
+
+            {/* Eventos pasados */}
             <Text style={styles.title}>Eventos Pasados</Text>
-            <FlatList
-                data={eventos.filter(event => !isDateFuture(event))}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderEventItem}
-                contentContainerStyle={styles.listContainer}
-                style={styles.flatList}
-            />
+            <ScrollView contentContainerStyle={styles.cardsContainer}>
+                {eventos.filter(event => !isDateFuture(event)).map((item) => (
+                    <View key={item.id} style={styles.eventCard}>
+                        <Text 
+                            style={styles.eventTitle} 
+                            onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token })}
+                        >
+                            {item.name}
+                        </Text>
+                        <Text>{item.start_date}</Text>
+                    </View>
+                ))}
+            </ScrollView>
         </View>
     );
 }
@@ -65,24 +80,27 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 10,
+        marginBottom: 20,
         textAlign: 'center',
     },
-    listContainer: {
-        paddingBottom: 20,
+    cardsContainer: {
+        marginBottom: 20,
     },
-    eventContainer: {
-        padding: 15,
+    eventCard: {
         backgroundColor: '#fff',
-        borderRadius: 5,
-        marginBottom: 10,
-        elevation: 1,
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 15,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     eventTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    flatList: {
-        maxHeight: 200,
+        color: '#007BFF',
+        marginBottom: 5,
     },
 });

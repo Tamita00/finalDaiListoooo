@@ -8,7 +8,6 @@ export const postAuth = async (endpoint, body, token) => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('response', response)
     return response.data;
   } catch (error) {
     console.error('Endpoint:', endpoint);

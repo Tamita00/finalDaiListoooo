@@ -2,44 +2,29 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../views/Login';
 import Register from '../views/Register';
 import Home from '../views/Home';
+import Index from '../views/Index';
 import Formulario from '../views/Formulario';
 import Confirmacion from '../views/Confirmacion';
-import DetalleEvento from '../views/DetalleEvento';
-import Index from '../views/Index';
-import Panel from '../views/Panel';
+import DetalleEvento from '../views/DetalleEvento'
+import Panel from '../views/Panel'
 import DetalleEventoAdmin from '../views/DetalleEventoAdmin';
-import { useAuth } from '../views/AuthContext';
-
-const Stack = createNativeStackNavigator();
+import Edicion from '../views/Edicion'
 
 const LoginNavigation = () => {
-
-
-  const { isAuthenticated } = useAuth();
-
-
-
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-    {isAuthenticated  ? (
-      <>
-        <Stack.Screen name="Index" component={Index} />
-        <Stack.Screen name="Panel" component={Panel} />
-        <Stack.Screen name="Formulario" component={Formulario} />
-      <Stack.Screen name="Confirmacion" component={Confirmacion} />
-      <Stack.Screen name="DetalleEvento" component={DetalleEvento} />
-      <Stack.Screen name="DetalleEventoAdmin" component={DetalleEventoAdmin} />
-      </>
-    ) : (
-      <>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-      </>
-    )}
-    
-  </Stack.Navigator>
+    const LoginStack = createNativeStackNavigator();
+    return (
+      <LoginStack.Navigator screenOptions={{ headerShown: false }}>
+        <LoginStack.Screen name="Home" component={Home}/>
+        <LoginStack.Screen name="Login" component={Login}/>
+        <LoginStack.Screen name="Register" component={Register}/>
+        <LoginStack.Screen name="Index" component={Index}/>
+        <LoginStack.Screen name="Formulario" component={Formulario}/>
+        <LoginStack.Screen name="Confirmacion" component={Confirmacion}/>
+        <LoginStack.Screen name="DetalleEvento" component={DetalleEvento}/>
+        <LoginStack.Screen name="DetalleEventoAdmin" component={DetalleEventoAdmin}/>
+        <LoginStack.Screen name="Panel" component={Panel}/>
+        <LoginStack.Screen name="Edicion" component={Edicion}/>
+      </LoginStack.Navigator>
   );
-};
-
+}
 export default LoginNavigation;
