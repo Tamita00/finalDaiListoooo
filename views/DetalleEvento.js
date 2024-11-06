@@ -74,15 +74,25 @@ export default function DetalleEvento() {
                 ))}
             </View>
 
-            {/* Botón de inscripción */}
+            {/* Botones de acción */}
             <View style={styles.buttonsContainer}>
+                {/* Botón de inscripción */}
                 <TouchableOpacity 
                     style={[styles.button, styles.enrollButton]}
                     onPress={enroll}
                 >
                     <Text style={styles.buttonText}>Inscribirse</Text>
                 </TouchableOpacity>
+
+                {/* Botón de edición */}
+                <TouchableOpacity 
+                    style={[styles.button, styles.editButton]}
+                    onPress={() => navigation.navigate('Edicion', { idEvent, token, idUser, evento })}
+                >
+                    <Text style={styles.buttonText}>Editar Evento</Text>
+                </TouchableOpacity>
             </View>
+
         </View>
     );
 }

@@ -117,3 +117,29 @@ export const createEvent = async(credentials) => {
     throw error;
   }
 }
+
+export const updateEventApi = async (idEvent, updatedData, token) => {
+  try {
+    // Verifica que el token esté disponible
+    if (!token) {
+      throw new Error("Token de autenticación no proporcionado");
+    }
+
+    console.log('Llegó a updateEventApi de AuthService');
+
+    // Realiza la solicitud PUT para actualizar el evento, enviando los datos en el cuerpo de la solicitud
+    const response = await api.put(`event/${idEvent}`, updatedData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',  // Asegúrate de indicar que el cuerpo es JSON
+      },
+    });
+
+    console.log("Evento actualizado:", response);
+
+    return response.data;  // Devuelve la respuesta de la API
+  } catch (error) {
+    console.error('Error en la actualización del evento:', error);
+    throw error; // Lanza el error para manejarlo en otro lugar si es necesario
+  }
+};
