@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-nativ
 import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getCategories, getLocations, postAuth } from '../authService';
+import Ionicons from 'react-native-vector-icons/Ionicons';  // Importar Ionicons
+
 
 export default function Formulario() {
     const navigation = useNavigation();
@@ -71,11 +73,11 @@ export default function Formulario() {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                style={styles.buttonSecondary}
-                onPress={() => navigation.navigate('Index', { token, id: idUser })}
-            >
-                <Text style={styles.buttonText}>Atrás</Text>
-            </TouchableOpacity>
+            style={styles.buttonBack}
+            onPress={() => navigation.navigate('Index', { token, id: idUser })}
+        >
+        <Ionicons name="arrow-back" size={24} color="#fff" />  {/* Icono de flecha hacia atrás */}
+    </TouchableOpacity>
             
             {/* Reemplazando Title por Text */}
             <Text style={styles.title}>Crear un nuevo evento</Text>
@@ -156,6 +158,23 @@ export default function Formulario() {
     );
 }
 const styles = StyleSheet.create({
+    buttonBack: {
+        position: 'absolute', // Posicionamos el botón en la esquina superior izquierda
+        top: 20, // Espacio desde la parte superior
+        left: 10, // Espacio desde la parte izquierda
+        padding: 8, // Relleno pequeño
+        backgroundColor: '#F9FAFB', // Color del fondo del botón
+        borderRadius: 50, // Botón redondeado
+        shadowColor: ' #D4F4D4',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    buttonTextFlecha: {
+        fontSize: 16,
+        color: '#fff',
+        fontWeight: '600',
+    },
     container: {
         flex: 1,
         backgroundColor: '#F9FAFB', // Fondo claro

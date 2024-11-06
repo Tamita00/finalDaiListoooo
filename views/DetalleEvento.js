@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { postAuth } from '../authService';
 import { getCategories, getLocations, getAuth } from '../authService';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function DetalleEvento() {
     const route = useRoute();
@@ -13,6 +14,7 @@ export default function DetalleEvento() {
     const [locations, setLocations]  = useState([]);
 
     const enroll = async () => {
+        console.log("llego al endpoint de inscribitse");
         const endpoint = 'event/' + idEvent + '/enrollment';
         const enrollment = await postAuth(endpoint, evento, token);
         console.log('enrollment.data', enrollment.data);
@@ -55,6 +57,15 @@ export default function DetalleEvento() {
 
     return (
         <View style={styles.container}>
+            {/* Botón de "Atrás" con flecha */}
+            <TouchableOpacity
+                style={styles.backButton} // Estilo del botón de atrás
+                onPress={() => navigation.navigate('Index', { token: token, idUser: idUser })}
+            >
+                <Ionicons name="arrow-back" size={24} color="#fff" /> {/* Ícono de flecha hacia atrás */}
+            </TouchableOpacity>
+
+            {/* Información del evento */}
             <View style={styles.datosEvento}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -62,13 +73,9 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
+
+            {/* Botón de inscripción */}
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity 
-                    style={[styles.button, styles.backButton]}
-                    onPress={() => navigation.navigate('Index', { token: token, idUser: idUser })}
-                >
-                    <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
                 <TouchableOpacity 
                     style={[styles.button, styles.enrollButton]}
                     onPress={enroll}
@@ -84,54 +91,60 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F9FAFB',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#F9FAFB', // Fondo claro
+        justifyContent: 'center', // Centrado vertical
+        alignItems: 'center', // Centrado horizontal
     },
     datosEvento: {
         width: '100%',
         maxWidth: 600, // Máximo ancho para pantallas grandes
         padding: 15,
-        backgroundColor: '#ffffff',
-        borderRadius: 10,
+        backgroundColor: '#ffffff', // Fondo blanco
+        borderRadius: 10, // Bordes redondeados
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 5,
-        marginBottom: 20,
+        elevation: 5, // Sombra ligera para dar profundidad
+        marginBottom: 20, // Espacio entre los elementos
     },
     text: {
         fontSize: 16,
-        color: '#333',
-        marginVertical: 5,
+        color: '#333', // Texto oscuro para mejor contraste
+        marginVertical: 5, // Espaciado entre los textos
     },
     buttonsContainer: {
         width: '100%',
         marginTop: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: 'row', // Alineación horizontal de los botones
+        justifyContent: 'space-between', // Espaciado entre los botones
     },
     button: {
         flex: 1,
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#4CAF50', // Color verde para el botón principal
         paddingVertical: 15,
         borderRadius: 10,
         marginBottom: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    backButton: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: '#007BFF',
+        alignItems: 'center', // Alineación del texto al centro
+        justifyContent: 'center', // Centrar contenido
     },
     enrollButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#4CAF50', // Botón de inscripción con verde
     },
     buttonText: {
-        color: 'white',
+        color: 'white', // Texto blanco para los botones
         fontSize: 16,
         fontWeight: '600',
+    },
+    // Estilo del botón de flecha
+    backButton: {
+        position: 'absolute', // Fijar el botón en la parte superior
+        left: 20, // Desplazarlo desde la izquierda
+        top: 20, // Colocarlo en la parte superior
+        backgroundColor: '#4CAF50', // Fondo verde
+        borderRadius: 50, // Redondeo del botón
+        padding: 10, // Espaciado pequeño alrededor del ícono
+        alignItems: 'center', // Alineación del ícono al centro
+        justifyContent: 'center', // Centrado del ícono
     },
 });
