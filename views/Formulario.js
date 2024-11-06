@@ -1,41 +1,26 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import CustomTextInput from '../components/textInput';
-import NumberInput from '../components/numberInput';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getCategories, getLocations, postAuth } from '../authService';
-import DateInput from '../components/dateInput';
-import BotonSecundario from '../components/BotonSecundario';
 
 export default function Formulario() {
     const navigation = useNavigation();
     
-    const [ nombre, setNombre ] = useState("");
-    const [ descripcion, setDescripcion ] = useState("");
-    const [ duracion, setDuracion ] = useState("");
-    const [ precio, setPrecio ] = useState("");
-    const [ asistenciaMax, setAsistenciaMax ] = useState("");
-    // const [showDatePicker, setShowDatePicker] = useState(false);
-    const [ eventDate, setEventDate] = useState("");
+    const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [duracion, setDuracion] = useState("");
+    const [precio, setPrecio] = useState("");
+    const [asistenciaMax, setAsistenciaMax] = useState("");
+    const [eventDate, setEventDate] = useState("");
     
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
-    const [idSelectedCategory, idSetSelectedCategory] = useState(null);
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
     
     const route = useRoute();
     const { token, idUser, nombre_user } = route.params;  
-    console.log(idUser);
-
-    const renderItem = (item) => (
-        <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.start_date}</Text>
-        </View>
-    );
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -46,7 +31,7 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
             }
         };
-    
+
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
@@ -55,12 +40,12 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
             }
         };
-    
+
         fetchCategories();
         fetchLocations();
     }, [token]);
 
-    function handleGuardar(){
+    function handleGuardar() {
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
@@ -73,19 +58,62 @@ export default function Formulario() {
             'max_assistance': asistenciaMax,
             "id_creator_user": idUser
         }
-        navigation.navigate('Confirmacion', {eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser});
+        navigation.navigate('Confirmacion', { eventoACrear, token, categories, locations, nombre_user, idUser });
         console.log(eventoACrear);
     }
 
+    const renderItem = (item) => (
+        <View style={styles.item}>
+            <Text style={styles.itemText}>{item.name}</Text>
+        </View>
+    );
+
     return (
         <View style={styles.container}>
-            <Title text="Crear un nuevo evento" />
-            <CustomTextInput placeholder="Nombre" value={nombre} onChangeText={setNombre}/>
-            <CustomTextInput placeholder="Descripción" value={descripcion} onChangeText={setDescripcion}/>
-            <NumberInput placeholder="Duración en minutos" value={duracion} onChange={setDuracion}/>
-            <NumberInput placeholder="Precio" value={precio} onChange={setPrecio}/>
-            <NumberInput placeholder="Asistencia máxima" value={asistenciaMax} onChange={setAsistenciaMax}/>
-            <DateInput date={eventDate} setFecha={setEventDate}/>
+            {/* Reemplazando Title por Text */}
+            <Text style={styles.title}>Crear un nuevo evento</Text>
+
+            <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                value={nombre}
+                onChangeText={setNombre}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={descripcion}
+                onChangeText={setDescripcion}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Duración en minutos"
+                keyboardType="numeric"
+                value={duracion}
+                onChangeText={setDuracion}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Precio"
+                keyboardType="numeric"
+                value={precio}
+                onChangeText={setPrecio}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Asistencia máxima"
+                keyboardType="numeric"
+                value={asistenciaMax}
+                onChangeText={setAsistenciaMax}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Fecha de evento"
+                value={eventDate}
+                onChangeText={setEventDate}
+            />
+
+            {/* Dropdown para categorías */}
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={categories}
@@ -93,12 +121,12 @@ export default function Formulario() {
                     valueField="id"
                     placeholder="Categoría"
                     value={idSelectedCategory}
-                    onChange={(item) => {
-                        idSetSelectedCategory(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
+                    onChange={(item) => setIdSelectedCategory(item.id)}
+                    renderItem={renderItem}
                 />
             </View>
+
+            {/* Dropdown para localidades */}
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={locations}
@@ -106,14 +134,22 @@ export default function Formulario() {
                     valueField="id"
                     placeholder="Localidad"
                     value={idSelectedLocation}
-                    onChange={(item) => {
-                        setIdSelectedLocation(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
+                    onChange={(item) => setIdSelectedLocation(item.id)}
+                    renderItem={renderItem}
                 />
             </View>
-            <Boton text={"Guardar"} onPress={handleGuardar} />
-            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Index', { token: token, id: idUser})}/>
+
+            {/* Botones */}
+            <TouchableOpacity style={styles.buttonPrimary} onPress={handleGuardar}>
+                <Text style={styles.buttonText}>Guardar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.buttonSecondary}
+                onPress={() => navigation.navigate('Index', { token, id: idUser })}
+            >
+                <Text style={styles.buttonText}>Atrás</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -123,56 +159,68 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f8f8f8',
         padding: 20,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 30,
+    },
+    input: {
+        width: '100%',
+        padding: 12,
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#d1d1d6',
+        fontSize: 16,
     },
     dropdownContainer: {
         width: '100%',
-        backgroundColor: 'white',
-        borderWidth: 0,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3, 
-        shadowRadius: 10,
-        elevation: 5,
-        borderColor: 'transparent',
-        fontSize: 16
+        marginVertical: 10,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333', 
-        marginBottom: 20,
-    },
-    boton: {
-        backgroundColor: '#4CAF50', 
+    buttonPrimary: {
+        width: '100%',
         paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 5,
-        elevation: 3, 
+        backgroundColor: '#007BFF',
+        borderRadius: 8,
+        alignItems: 'center',
+        marginVertical: 10,
     },
-    botonText: {
+    buttonSecondary: {
+        width: '100%',
+        paddingVertical: 15,
+        backgroundColor: '#f1f1f1',
+        borderRadius: 8,
+        alignItems: 'center',
+        marginVertical: 10,
+        borderColor: '#007BFF',
+        borderWidth: 1,
+    },
+    buttonText: {
+        fontSize: 16,
         color: '#fff',
-        fontSize: 18,
-        textAlign: 'center',
+        fontWeight: '600',
     },
     item: {
         padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
         backgroundColor: '#f9f9f9',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
     itemText: {
         fontSize: 16,
-        fontWeight: 'bold',
         color: '#333',
-    },
-    itemDate: {
-        fontSize: 12,
-        color: '#666',
     },
 });

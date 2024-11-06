@@ -1,106 +1,58 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
-import React, { useState, useEffect } from 'react';
-import CustomTextInput from '../components/textInput';
-import NumberInput from '../components/numberInput';
-import { Dropdown } from 'react-native-element-dropdown';
-import { getCategories, getLocations, postAuth } from '../authService';
-import DateInput from '../components/dateInput';
-import BotonSecundario from '../components/BotonSecundario';
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import React from 'react';
 
-
-export default function Edicion() {
+export default function DetalleEventoAdmin() {
     const navigation = useNavigation();
+    const saludo = "Detalle del evento";
     const route = useRoute();
-    const { token, eventoAEditar, idUser } = route.params;
-    
-    const [ nombre, setNombre ] = useState("");
-    const [ descripcion, setDescripcion ] = useState("");
-    const [ duracion, setDuracion ] = useState("");
-    const [ precio, setPrecio ] = useState("");
-    const [ asistenciaMax, setAsistenciaMax ] = useState("");
-    const [ eventDate, setEventDate] = useState("");
-    
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
-    const [idSelectedCategory, idSetSelectedCategory] = useState(null);
-    const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-    
-    const renderItem = (item) => (
-        <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.start_date}</Text>
-        </View>
-    );
-    const handleGuardar = () => (
-        alert('hola!')
-    );
+    const { idEvent, token, idUser, evento } = route.params;
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await getCategories(token);
-                setCategories(data);
-            } catch (error) {
-                console.error('(UseEffect) Error al cargar las categorías:', error);
-            }
-        };
-    
-        const fetchLocations = async () => {
-            try {
-                const data = await getLocations(token);
-                setLocations(data);
-            } catch (error) {
-                console.error('(UseEffect) Error al cargar las localidades:', error);
-            }
-        };
-        console.log('eventoAEditar', eventoAEditar);
-        fetchCategories();
-        fetchLocations();
-    }, [token]);
+    const displayData = {
+        'Nombre': evento.name,
+        'Descripcion': evento.description,
+        'Categoria': evento.id_event_category || 'Desconocida',
+        'Localidad': evento.id_event_location || 'Desconocida', 
+        'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
+        'Duracion': `${evento.duration_in_minutes} minutos`,
+        'Precio': `$${evento.price}`
+    };
+
+    const fechaInicioEvento = new Date(evento.start_date);
+    const fechaActual = new Date();
 
     return (
         <View style={styles.container}>
-            <Title text='Editar evento'/>
-            <CustomTextInput placeholder="Nombre" value={eventoAEditar.name} onChangeText={setNombre}/>
-            <CustomTextInput placeholder="Descripción" value={eventoAEditar.description} onChangeText={setDescripcion}/>
-            <NumberInput placeholder="Duración en minutos" value={eventoAEditar.duration_in_minutes} onChange={setDuracion}/>
-            <NumberInput placeholder="Precio" value={eventoAEditar.price} onChange={setPrecio}/>
-            <NumberInput placeholder="Asistencia máxima" value={eventoAEditar.max_assistance} onChange={setAsistenciaMax}/>
-            <DateInput date={eventDate} setFecha={setEventDate}/>
-            <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={categories}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Categoría"
-                    value={idSelectedCategory}
-                    onChange={(item) => {
-                        idSetSelectedCategory(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
-                />
+            {/* Reemplazo de Title por un Text normal */}
+            <Text style={styles.title}>{saludo}</Text>
+
+            <View style={styles.datosEvento}>
+                {Object.entries(displayData).map(([key, value]) => (
+                    <Text key={key} style={styles.text}>
+                        {`${key}: ${value}`}
+                    </Text>
+                ))}
             </View>
-            <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={locations}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Localidad"
-                    value={idSelectedLocation}
-                    onChange={(item) => {
-                        setIdSelectedLocation(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
-                />
+
+            <View style={styles.buttonsContainer}>
+                {/* Reemplazo de BotonSecundario por TouchableOpacity */}
+                <TouchableOpacity 
+                    style={[styles.button, styles.backButton]} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}>
+                    <Text style={styles.buttonText}>Atrás</Text>
+                </TouchableOpacity>
+
+                {/* Solo mostramos el botón de "Editar" si la fecha del evento es posterior a la fecha actual */}
+                {fechaInicioEvento > fechaActual ? (
+                    <TouchableOpacity 
+                        style={[styles.button, styles.editButton]} 
+                        onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })}>
+                        <Text style={styles.buttonText}>Editar</Text>
+                    </TouchableOpacity>
+                ) : null}
             </View>
-            <Boton text={"Guardar"} onPress={handleGuardar} />
-            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Index', { token: token, id: idUser})}/>
         </View>
-        
-        
     );
 }
 
@@ -112,9 +64,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#333',
+    },
     datosEvento: {
         width: '100%',
-        maxWidth: 600,
+        maxWidth: 600, 
         padding: 15,
         backgroundColor: '#ffffff',
         borderRadius: 10,
@@ -130,20 +88,31 @@ const styles = StyleSheet.create({
         color: '#333',
         marginVertical: 5,
     },
-    dropdownContainer: {
+    buttonsContainer: {
         width: '100%',
-        backgroundColor: 'white',
-        borderWidth: 0,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3, 
-        shadowRadius: 10,
-        elevation: 5,
-        borderColor: 'transparent',
-        fontSize: 16
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 15,
+        marginHorizontal: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    backButton: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: '#007BFF', // Azul similar al original
+    },
+    editButton: {
+        backgroundColor: '#007BFF', // Azul para el botón de "Editar"
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600', // Textos con más peso
     },
 });
