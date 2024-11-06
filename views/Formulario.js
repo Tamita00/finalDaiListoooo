@@ -70,6 +70,13 @@ export default function Formulario() {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+                style={styles.buttonSecondary}
+                onPress={() => navigation.navigate('Index', { token, id: idUser })}
+            >
+                <Text style={styles.buttonText}>Atrás</Text>
+            </TouchableOpacity>
+            
             {/* Reemplazando Title por Text */}
             <Text style={styles.title}>Crear un nuevo evento</Text>
 
@@ -144,29 +151,22 @@ export default function Formulario() {
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.buttonSecondary}
-                onPress={() => navigation.navigate('Index', { token, id: idUser })}
-            >
-                <Text style={styles.buttonText}>Atrás</Text>
-            </TouchableOpacity>
+            
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f8f8f8',
+        backgroundColor: '#F9FAFB', // Fondo claro
         padding: 20,
     },
     title: {
         fontSize: 28,
         fontWeight: '700',
         color: '#333',
-        marginBottom: 30,
+        textAlign: 'center',
+        marginBottom: 20, // Un pequeño ajuste para alinearlo con el diseño general
     },
     input: {
         width: '100%',
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: '#d1d1d6',
+        borderColor: '#d1d1d6', // Color más suave para bordes
         fontSize: 16,
     },
     dropdownContainer: {
@@ -193,34 +193,32 @@ const styles = StyleSheet.create({
     buttonPrimary: {
         width: '100%',
         paddingVertical: 15,
-        backgroundColor: '#007BFF',
-        borderRadius: 8,
+        backgroundColor: '#4CAF50', // Color verde para el botón primario
+        borderRadius: 10,
         alignItems: 'center',
         marginVertical: 10,
     },
     buttonSecondary: {
         width: '100%',
         paddingVertical: 15,
-        backgroundColor: '#f1f1f1',
-        borderRadius: 8,
+        backgroundColor: '#007BFF', // Color azul para el botón secundario
+        borderRadius: 10,
         alignItems: 'center',
         marginVertical: 10,
-        borderColor: '#007BFF',
-        borderWidth: 1,
     },
     buttonText: {
         fontSize: 16,
-        color: '#fff',
+        color: '#fff', // Texto blanco en los botones
         fontWeight: '600',
     },
     item: {
         padding: 12,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: '#eee', // Color sutil para el borde de los ítems
     },
     itemText: {
         fontSize: 16,
-        color: '#333',
+        color: '#333', // Texto oscuro para los ítems
     },
 });

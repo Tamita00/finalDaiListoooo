@@ -72,18 +72,17 @@ export default function Register() {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#121212',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#F9FAFB', // Fondo blanco suave (más claro que el negro)
+        justifyContent: 'center', // Centrado vertical
+        alignItems: 'center', // Centrado horizontal
         padding: 25,
     },
     title: {
         fontSize: 28,
-        color: '#FF6B6B',
+        color: '#333', // Título en un tono rojo suave
         fontWeight: 'bold',
         marginBottom: 30,
         textAlign: 'center',
@@ -92,39 +91,39 @@ const styles = StyleSheet.create({
         width: '80%',
         marginTop: 20,
         paddingVertical: 20,
-        alignItems: 'center',
+        alignItems: 'center', // Centra los campos de entrada
     },
     input: {
         width: '100%',
         padding: 18,
         borderRadius: 12,
-        backgroundColor: '#333333',
-        borderColor: '#444',
+        backgroundColor: '#FFFFFF', // Fondo blanco para el input
+        borderColor: '#DDDDDD', // Bordes en gris claro
         borderWidth: 1.5,
-        color: '#fff',
+        color: '#333', // Texto oscuro para mejor contraste
         marginBottom: 15,
         fontSize: 16,
         fontWeight: '500',
-        shadowColor: '#000',
+        shadowColor: '#000', // Sombra sutil
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 6,
-        elevation: 6,
+        elevation: 2,
     },
     submitButton: {
-        backgroundColor: '#FF6B6B',
+        backgroundColor: '#4CAF50', // Botón rojo
         paddingVertical: 18,
         paddingHorizontal: 40,
         borderRadius: 30,
-        shadowColor: '#FF6B6B',
+        shadowColor: '#77DD77', // Sombra roja sutil
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
-        alignItems: 'center',
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 4,
+        alignItems: 'center', // Centrado del texto en el botón
     },
     submitButtonText: {
-        color: '#fff',
+        color: '#fff', // Texto blanco en el botón
         fontSize: 18,
         fontWeight: 'bold',
     },
