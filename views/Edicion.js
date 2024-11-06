@@ -6,14 +6,14 @@ import { updateEventApi } from '../authService';
 export default function Edicion() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { idEvent, token, idUser, eventoAEditar } = route.params;
-
+    const { idEvent, token, idUser, evento } = route.params;
+    
     // Estado para los campos editables
-    const [name, setName] = useState(eventoAEditar.name);
-    const [description, setDescription] = useState(eventoAEditar.description);
-    const [startDate, setStartDate] = useState(new Date(eventoAEditar.start_date).toLocaleString());
-    const [duration, setDuration] = useState(eventoAEditar.duration_in_minutes.toString());
-    const [price, setPrice] = useState(eventoAEditar.price.toString());
+    const [name, setName] = useState(evento.name);
+    const [description, setDescription] = useState(evento.description);
+    const [startDate, setStartDate] = useState(new Date(evento.start_date).toLocaleString());
+    const [duration, setDuration] = useState(evento.duration_in_minutes.toString());
+    const [price, setPrice] = useState(evento.price.toString());
 
     // Función para manejar el envío de datos (simulando una actualización)
     
@@ -104,44 +104,50 @@ const handleUpdateEvent = async () => {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#F9FAFB', // Fondo claro
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        textAlign: 'center',
+        textAlign: 'center', // Alineación central del título
+        color: '#333', // Color oscuro para el texto
     },
     input: {
         width: '100%',
         padding: 12,
         borderRadius: 8,
         marginBottom: 10,
-        backgroundColor: '#fff',
+        backgroundColor: '#fff', // Fondo blanco para los inputs
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#ccc', // Color de borde gris claro
         fontSize: 16,
+        color: '#333', // Color de texto oscuro
     },
     button: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#4CAF50', // Fondo verde para el botón
         paddingVertical: 15,
         borderRadius: 8,
         marginBottom: 10,
-        alignItems: 'center',
+        alignItems: 'center', // Alineación del contenido en el centro
+        justifyContent: 'center', // Centrado del texto en el botón
     },
     cancelButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: 'transparent', // Fondo transparente para el botón de cancelar
         borderWidth: 1,
-        borderColor: '#007BFF',
+        borderColor: '#4CAF50', // Borde verde
+        paddingVertical: 10, // Espaciado vertical
+        paddingHorizontal: 20, // Espaciado horizontal
+        borderRadius: 8, // Bordes redondeados
+        alignItems: 'center', // Centrado del contenido
     },
     buttonText: {
-        color: 'white',
+        color: 'white', // Texto blanco en los botones
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '600', // Negrita para el texto
     },
 });

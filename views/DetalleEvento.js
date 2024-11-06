@@ -8,6 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function DetalleEvento() {
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
+    console.log(idEvent, token, idUser, evento);
     const navigation = useNavigation();
 
     const [categories, setCategories ] = useState([]);
