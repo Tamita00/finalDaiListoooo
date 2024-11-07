@@ -1,13 +1,16 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getCategories, getLocations } from '../authService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function Formulario() {
     const navigation = useNavigation();
-    
+    const route = useRoute();
+    const { token, idUser, nombre_user } = route.params;
+
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [duracion, setDuracion] = useState("");
@@ -21,16 +24,6 @@ export default function Formulario() {
     const [idSelectedCategory, idSetSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
 
-    const route = useRoute();
-    const { token, idUser, nombre_user } = route.params;  
-
-    const renderItem = (item) => (
-        <View style={styles.item}>
-            <Text style={styles.itemText}>{item.name}</Text>
-            <Text style={styles.itemDate}>{item.start_date}</Text>
-        </View>
-    );
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -40,7 +33,7 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
             }
         };
-    
+
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
@@ -49,7 +42,7 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
             }
         };
-    
+
         fetchCategories();
         fetchLocations();
     }, [token]);
@@ -72,40 +65,46 @@ export default function Formulario() {
 
     return (
         <View style={styles.container}>
+            {/* Flecha para regresar */}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Index', { token, id: idUser })}>
+                <Ionicons name="arrow-back" size={30} color="#757575" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Crear un nuevo evento</Text>
-            <TextInput 
-                style={styles.input} 
-                placeholder="Nombre" 
-                value={nombre} 
-                onChangeText={setNombre} 
+
+            <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                value={nombre}
+                onChangeText={setNombre}
             />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Descripción" 
-                value={descripcion} 
-                onChangeText={setDescripcion} 
-                multiline 
+            <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={descripcion}
+                onChangeText={setDescripcion}
+                multiline
             />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Duración en minutos" 
-                value={duracion} 
-                onChangeText={setDuracion} 
-                keyboardType="numeric" 
+            <TextInput
+                style={styles.input}
+                placeholder="Duración en minutos"
+                value={duracion}
+                onChangeText={setDuracion}
+                keyboardType="numeric"
             />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Precio" 
-                value={precio} 
-                onChangeText={setPrecio} 
-                keyboardType="numeric" 
+            <TextInput
+                style={styles.input}
+                placeholder="Precio"
+                value={precio}
+                onChangeText={setPrecio}
+                keyboardType="numeric"
             />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Asistencia máxima" 
-                value={asistenciaMax} 
-                onChangeText={setAsistenciaMax} 
-                keyboardType="numeric" 
+            <TextInput
+                style={styles.input}
+                placeholder="Asistencia máxima"
+                value={asistenciaMax}
+                onChangeText={setAsistenciaMax}
+                keyboardType="numeric"
             />
 
             <TouchableOpacity style={styles.datePicker} onPress={() => setShowDatePicker(true)}>
@@ -150,17 +149,28 @@ export default function Formulario() {
             <TouchableOpacity style={styles.button} onPress={handleGuardar}>
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
-
-            <Button title="Atrás" onPress={() => navigation.navigate('Index', { token, id: idUser })} color="#757575" />
         </View>
     );
 }
+
+const renderItem = (item) => (
+    <View style={styles.item}>
+        <Text style={styles.itemText}>{item.name}</Text>
+        <Text style={styles.itemDate}>{item.start_date}</Text>
+    </View>
+);
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f3f4f6',
         padding: 20,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 10,
+        zIndex: 10,
     },
     title: {
         fontSize: 26,

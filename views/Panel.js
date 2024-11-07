@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importamos Ionicons
 import { getEventos } from '../authService';
 
 export default function Panel() {
@@ -34,6 +35,11 @@ export default function Panel() {
 
     return (
         <View style={styles.container}>
+            {/* Flecha para volver atrás */}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color="#333" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Próximos Eventos</Text>
             <View style={styles.cardContainer}>
                 {eventos.filter(isDateFuture).map((item) => (
@@ -100,10 +106,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: 'center',
     },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        zIndex: 1,
+    },
     cardContainer: {
+        display: 'flex',
+        flexDirection: 'row', // Para que las cards estén en fila
+        flexWrap: 'wrap',     // Permite que las cards se acomoden en varias filas
+        justifyContent: 'space-between', // Espaciado uniforme entre las tarjetas
+        gap: 20,              // Espacio entre las tarjetas
         marginBottom: 30,
     },
     card: {
+        width: '48%',        // Dos tarjetas por fila
         backgroundColor: '#fff',
         borderRadius: 10,
         padding: 15,
@@ -113,11 +131,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+        transition: 'transform 0.3s ease', // Efecto de hover
+        cursor: 'pointer',
     },
     cardTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: 'grey',
+        marginBottom: 10,
+        cursor: 'pointer',
     },
     cardDate: {
         fontSize: 14,
@@ -131,7 +153,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     createEventButton: {
-        backgroundColor: '#34A853', // Verde
+        backgroundColor: '#34A853', // Verde brillante para el botón
     },
     buttonText: {
         color: 'white',

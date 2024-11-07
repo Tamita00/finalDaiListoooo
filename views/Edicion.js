@@ -1,7 +1,7 @@
-
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getCategories, getLocations } from '../authService';
 
@@ -9,7 +9,7 @@ export default function Edicion() {
     const navigation = useNavigation();
     const route = useRoute();
     const { token, eventoAEditar, idUser } = route.params;
-    
+
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [duracion, setDuracion] = useState("");
@@ -20,34 +20,6 @@ export default function Edicion() {
     const [locations, setLocations] = useState([]);
     const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-
-    const renderItem = (item) => (
-        <View style={styles.item}>
-            <Text style={styles.itemText}>{item.name}</Text>
-            <Text style={styles.itemDate}>{item.start_date}</Text>
-        </View>
-    );
-
-    const handleGuardar = () => {
-        const eventoEditado = {
-            'name': nombre,
-            'description': descripcion,
-            'id_event_category': idSelectedCategory,
-            'id_event_location': idSelectedLocation,
-            'start_date': eventDate,
-            'duration_in_minutes': duracion,
-            'price': precio,
-            "enabled_for_enrollment": 1,
-            'max_assistance': asistenciaMax,
-            "id_creator_user": idUser
-        };
-        navigation.navigate('Confirmacion', { eventoEditado, token, categories, locations, idUser });
-    };
-
-    const handleDateChange = (newDate) => {
-        const formattedDate = new Date(newDate).toISOString();
-        setEventDate(formattedDate);
-    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -77,9 +49,43 @@ export default function Edicion() {
         }
     }, [eventoAEditar, token]);
 
+    const renderItem = (item) => (
+        <View style={styles.item}>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.itemDate}>{item.start_date}</Text>
+        </View>
+    );
+
+    const handleGuardar = () => {
+        const eventoEditado = {
+            'name': nombre,
+            'description': descripcion,
+            'id_event_category': idSelectedCategory,
+            'id_event_location': idSelectedLocation,
+            'start_date': eventDate,
+            'duration_in_minutes': duracion,
+            'price': precio,
+            "enabled_for_enrollment": 1,
+            'max_assistance': asistenciaMax,
+            "id_creator_user": idUser
+        };
+        navigation.navigate('Confirmacion', { eventoEditado, token, categories, locations, idUser });
+    };
+
+    const handleDateChange = (newDate) => {
+        const formattedDate = new Date(newDate).toISOString();
+        setEventDate(formattedDate);
+    };
+
     return (
         <View style={styles.container}>
+            {/* Flecha para regresar */}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Panel', { token, id: idUser })}>
+                <Ionicons name="arrow-back" size={30} color="#757575" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Editar evento</Text>
+
             <TextInput
                 style={styles.input}
                 placeholder={eventoAEditar.name}
@@ -119,6 +125,7 @@ export default function Edicion() {
                 value={eventDate}
                 onChangeText={handleDateChange}
             />
+
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     value={eventoAEditar.id_event_category}
@@ -126,9 +133,7 @@ export default function Edicion() {
                     labelField="name"
                     valueField="id"
                     placeholder="Categoría"
-                    onChange={(item) => {
-                        setIdSelectedCategory(item.id);
-                    }}
+                    onChange={(item) => setIdSelectedCategory(item.id)}
                     renderItem={(item) => renderItem(item)}
                 />
             </View>
@@ -140,9 +145,7 @@ export default function Edicion() {
                     valueField="id"
                     placeholder="Localidad"
                     value={eventoAEditar.id_event_location}
-                    onChange={(item) => {
-                        setIdSelectedLocation(item.id);
-                    }}
+                    onChange={(item) => setIdSelectedLocation(item.id)}
                     renderItem={(item) => renderItem(item)}
                 />
             </View>
@@ -150,6 +153,7 @@ export default function Edicion() {
             <TouchableOpacity style={styles.button} onPress={handleGuardar}>
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Panel', { token: token, id: idUser })}>
                 <Text style={styles.buttonSecondaryText}>Atrás</Text>
             </TouchableOpacity>
@@ -164,6 +168,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 10,
+        zIndex: 10,
     },
     title: {
         fontSize: 24,

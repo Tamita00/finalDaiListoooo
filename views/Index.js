@@ -46,7 +46,7 @@ export default function Index() {
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Próximos Eventos</h1>
-            
+
             <div style={styles.cardContainer}>
                 {eventos.filter(isDateFuture).map(item => (
                     <div style={styles.eventContainer} key={item.id}>
@@ -68,7 +68,7 @@ export default function Index() {
                 style={{ ...styles.boton, ...styles.crearEvento }} 
                 onClick={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
             >
-                Crear
+                Crear Evento
             </button>
 
             {id === 34 || id === 36 ? (
@@ -94,26 +94,35 @@ const styles = {
         fontSize: '24px',
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: '10px',
+        marginBottom: '20px',
         textAlign: 'center',
     },
     cardContainer: {
+        margin:"5% 5% 5%",
         display: 'flex',
-        flexDirection: 'column',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
         gap: '20px',
-        width:"5em"
     },
     eventContainer: {
-        padding: '15px',
+        width: '30%',
+        padding: '20px',
         backgroundColor: '#fff',
-        borderRadius: '5px',
+        borderRadius: '10px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.3s ease',
+        cursor: 'pointer',
+        color: "grey",
+    },
+    eventContainerHover: {
+        transform: 'scale(1.05)',
     },
     eventTitle: {
         fontSize: '18px',
         fontWeight: 'bold',
         cursor: 'pointer',
         color: '#007bff',
+        marginBottom: '10px',
     },
     attendantText: {
         fontSize: '14px',
@@ -131,16 +140,25 @@ const styles = {
         color: 'white',
         cursor: 'pointer',
         border: 'none',
+        transition: 'all 0.3s ease', // Suaviza la transición de hover
     },
     crearEvento: {
-        backgroundColor: '#34A853',  // Botón verde para crear evento
+        backgroundColor: '#34A853',  // Verde brillante para Crear Evento
     },
     verTodos: {
-        backgroundColor: 'D5DBDB',
-        color: 'grey',
-        fontSize: 16,
+        background: 'linear-gradient(145deg, #6d7c96, #4a5468)', // Gradiente atractivo
+        color: 'white',
+        fontSize: '16px',
         fontWeight: 'bold',
-        border: 'F8F9FD',  // Borde verde para ver todos los eventos
+        borderRadius: '8px',
+        padding: '12px 24px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra sutil para profundidad
+        border: 'none',
+        marginTop: '20px',
+        transition: 'transform 0.3s ease, background-color 0.3s ease', // Transición suave
+    },
+    verTodosHover: {
+        background: 'linear-gradient(145deg, #4a5468, #6d7c96)', // Cambiar gradiente en hover
+        transform: 'scale(1.05)', // Efecto de aumento de tamaño al hacer hover
     },
 };
-

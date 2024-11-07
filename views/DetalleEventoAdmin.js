@@ -1,11 +1,11 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { get, deleteAuth } from '../authService';
 
 export default function DetalleEventoAdmin() {
     const navigation = useNavigation();
-    const saludo = "Detalle del evento";
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
     const [inscriptos, setInscriptos] = useState([]);
@@ -48,7 +48,7 @@ export default function DetalleEventoAdmin() {
         'Nombre': evento.name,
         'Descripcion': evento.description,
         'Categoria': evento.id_event_category || 'Desconocida',
-        'Localidad': evento.id_event_location || 'Desconocida', 
+        'Localidad': evento.id_event_location || 'Desconocida',
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -59,7 +59,13 @@ export default function DetalleEventoAdmin() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{saludo}</Text>
+            {/* Flecha para regresar */}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Index', { token, id: idUser })}>
+                <Ionicons name="arrow-back" size={30} color="#757575" />
+            </TouchableOpacity>
+
+            <Text style={styles.title}>Detalle del evento</Text>
+
             <View style={[styles.card, styles.cardData]}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -67,6 +73,7 @@ export default function DetalleEventoAdmin() {
                     </Text>
                 ))}
             </View>
+
             <View style={styles.card}>
                 <Text style={styles.tituloCard}>Inscriptos</Text>
                 <FlatList
@@ -81,23 +88,24 @@ export default function DetalleEventoAdmin() {
                     style={styles.flatList}
                 />
             </View>
+
             <View style={styles.containerBotones}>
-                <TouchableOpacity 
-                    style={[styles.button, styles.buttonSecondary]} 
+                <TouchableOpacity
+                    style={[styles.button, styles.buttonSecondary]}
                     onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
                 >
                     <Text style={styles.buttonText}>Atrás</Text>
                 </TouchableOpacity>
                 {fechaInicioEvento > fechaActual && (
                     <>
-                        <TouchableOpacity 
-                            style={styles.button} 
-                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })}
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => navigation.navigate('Edicion', { idEvent, token, id: idUser, eventoAEditar: evento })}
                         >
                             <Text style={styles.buttonText}>Editar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={styles.button} 
+                        <TouchableOpacity
+                            style={styles.button}
                             onPress={eliminarEvento}
                         >
                             <Text style={styles.buttonText}>Eliminar</Text>
@@ -116,6 +124,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 10,
+        zIndex: 10,
     },
     title: {
         fontSize: 24,
