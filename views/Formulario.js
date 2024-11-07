@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -21,7 +21,7 @@ export default function Formulario() {
 
     const [categories, setCategories] = useState([]);
     const [locations, setLocations] = useState([]);
-    const [idSelectedCategory, idSetSelectedCategory] = useState(null);
+    const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
 
     useEffect(() => {
@@ -47,7 +47,7 @@ export default function Formulario() {
         fetchLocations();
     }, [token]);
 
-    function handleGuardar() {
+    const handleGuardar = () => {
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
@@ -61,7 +61,14 @@ export default function Formulario() {
             "id_creator_user": idUser
         };
         navigation.navigate('Confirmacion', { eventoACrear, token, categories, locations, nombre_user, idUser });
-    }
+    };
+
+    const handleDateChange = (event, date) => {
+        setShowDatePicker(false); // Cerrar el picker después de seleccionar la fecha
+        if (date) {
+            setEventDate(date);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -78,12 +85,14 @@ export default function Formulario() {
                 placeholder="Nombre"
                 value={nombre}
                 onChangeText={setNombre}
+                textAlign="center"
             />
             <TextInput
                 style={styles.input}
                 placeholder="Descripción"
                 value={descripcion}
                 onChangeText={setDescripcion}
+                textAlign="center"
                 multiline
             />
             <TextInput
@@ -91,6 +100,7 @@ export default function Formulario() {
                 placeholder="Duración en minutos"
                 value={duracion}
                 onChangeText={setDuracion}
+                textAlign="center"
                 keyboardType="numeric"
             />
             <TextInput
@@ -98,6 +108,7 @@ export default function Formulario() {
                 placeholder="Precio"
                 value={precio}
                 onChangeText={setPrecio}
+                textAlign="center"
                 keyboardType="numeric"
             />
             <TextInput
@@ -105,24 +116,43 @@ export default function Formulario() {
                 placeholder="Asistencia máxima"
                 value={asistenciaMax}
                 onChangeText={setAsistenciaMax}
+                textAlign="center"
                 keyboardType="numeric"
             />
 
-            {/* Selector de fecha */}
-            <TouchableOpacity style={styles.datePicker} onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.dateText}>{eventDate.toLocaleDateString()}</Text>
-                {showDatePicker && (
-                    <DateTimePicker
-                        value={eventDate}
-                        mode="date"
-                        display="default"
-                        onChange={(event, date) => {
-                            setShowDatePicker(false);
-                            if (date) setEventDate(date);
-                        }}
-                    />
-                )}
-            </TouchableOpacity>
+            {/* Selector de fecha con icono de calendario */}
+            <View style={styles.datePickerContainer}>
+                <TextInput
+                    style={styles.dateInput}
+                    placeholder="dd/mm/yyyy"  // Placeholder con el formato
+                    value={eventDate.toLocaleDateString('es-ES')}  // Mostrar la fecha en formato dd/mm/yyyy
+                    textAlign="center"
+                    editable={true}  // Permitir la edición manual
+                    onChangeText={(text) => {
+                        // Validar la entrada y actualizar la fecha
+                        const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                        const match = text.match(regex);
+                        if (match) {
+                            const [ , day, month, year ] = match;
+                            const newDate = new Date(year, month - 1, day);
+                            if (newDate.getDate() === parseInt(day) && newDate.getMonth() === parseInt(month) - 1 && newDate.getFullYear() === parseInt(year)) {
+                                setEventDate(newDate);
+                            }
+                        }
+                    }}
+                />
+                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                    <Ionicons name="calendar" size={24} color="#757575" />
+                </TouchableOpacity>
+            </View>
+            {showDatePicker && (
+                <DateTimePicker
+                    value={eventDate}
+                    mode="date"
+                    display="default"
+                    onChange={handleDateChange}
+                />
+            )}
 
             {/* Dropdown para categorías */}
             <View style={styles.dropdownContainer}>
@@ -132,8 +162,9 @@ export default function Formulario() {
                     valueField="id"
                     placeholder="Categoría"
                     value={idSelectedCategory}
-                    onChange={(item) => idSetSelectedCategory(item.id)}
-                    renderItem={renderItem}
+                    onChange={(item) => setIdSelectedCategory(item.id)}
+                    style={styles.dropdown}
+                    selectedTextStyle={{ textAlign: "center" }}
                 />
             </View>
 
@@ -146,7 +177,8 @@ export default function Formulario() {
                     placeholder="Localidad"
                     value={idSelectedLocation}
                     onChange={(item) => setIdSelectedLocation(item.id)}
-                    renderItem={renderItem}
+                    style={styles.dropdown}
+                    selectedTextStyle={{ textAlign: "center" }}
                 />
             </View>
 
@@ -157,13 +189,6 @@ export default function Formulario() {
         </View>
     );
 }
-
-// Función para renderizar cada item de los dropdowns
-const renderItem = (item) => (
-    <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-    </View>
-);
 
 // Estilos
 const styles = StyleSheet.create({
@@ -196,26 +221,34 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderWidth: 1,
     },
-    datePicker: {
-        width: '100%',
-        paddingVertical: 15,
-        paddingHorizontal: 15,
+    datePickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: '#ffffff',
         borderRadius: 8,
-        justifyContent: 'center',
+        paddingHorizontal: 15,
         borderColor: '#ddd',
         borderWidth: 1,
         marginBottom: 15,
     },
-    dateText: {
+    dateInput: {
+        flex: 1,
         fontSize: 16,
+        paddingVertical: 15,
         color: '#666',
+        textAlign: "center"
     },
     dropdownContainer: {
         width: '100%',
         marginBottom: 15,
         borderRadius: 8,
-        overflow: 'hidden',
+    },
+    dropdown: {
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 8,
+        backgroundColor: '#ffffff',
+        paddingHorizontal: 15,
     },
     button: {
         backgroundColor: '#4CAF50',
@@ -228,13 +261,5 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 18,
         fontWeight: '600',
-    },
-    item: {
-        padding: 12,
-        backgroundColor: '#f9f9f9',
-    },
-    itemText: {
-        fontSize: 16,
-        color: '#333',
     },
 });
