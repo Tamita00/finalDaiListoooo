@@ -1,28 +1,26 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import Boton from '../components/Boton';
 import React, { useState, useEffect } from 'react';
+import BotonSecundario from '../components/BotonSecundario';
 import { postAuth } from '../authService';
 import { getCategories, getLocations, getAuth } from '../authService';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function DetalleEvento() {
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
-    console.log(idEvent, token, idUser, evento);
     const navigation = useNavigation();
 
     const [categories, setCategories ] = useState([]);
     const [locations, setLocations]  = useState([]);
 
     const enroll = async () => {
-        console.log("llego al endpoint de inscribitse");
         const endpoint = 'event/' + idEvent + '/enrollment';
         const enrollment = await postAuth(endpoint, evento, token);
         console.log('enrollment.data', enrollment.data);
-        alert('Te registraste exitosamente! :D');
-        navigation.navigate('Index', { token: token, idUser: idUser });
+        alert('Te registraste exitosamente! :D')
+        navigation.navigate('Index', { token: token, idUser: idUser});
     }
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -46,10 +44,14 @@ export default function DetalleEvento() {
         fetchLocations();
     }, [token]);
 
+    console.log('id_event_category', evento.id_event_category);
+    console.log('categorías', categories); 
+    console.log('categorías sub id-event-category', categories[evento.id_event_category]); 
+
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida', 
+        'Categoria': evento.id_event_category || 'Desconocida', //se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
         'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
@@ -58,15 +60,6 @@ export default function DetalleEvento() {
 
     return (
         <View style={styles.container}>
-            {/* Botón de "Atrás" con flecha */}
-            <TouchableOpacity
-                style={styles.backButton} // Estilo del botón de atrás
-                onPress={() => navigation.navigate('Index', { token: token, idUser: idUser })}
-            >
-                <Ionicons name="arrow-back" size={24} color="#fff" /> {/* Ícono de flecha hacia atrás */}
-            </TouchableOpacity>
-
-            {/* Información del evento */}
             <View style={styles.datosEvento}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -74,26 +67,16 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
-
-            {/* Botones de acción */}
-            <View style={styles.buttonsContainer}>
-                {/* Botón de inscripción */}
-                <TouchableOpacity 
-                    style={[styles.button, styles.enrollButton]}
-                    onPress={enroll}
-                >
-                    <Text style={styles.buttonText}>Inscribirse</Text>
-                </TouchableOpacity>
-
-                {/* Botón de edición */}
-                <TouchableOpacity 
-                    style={[styles.button, styles.editButton]}
-                    onPress={() => navigation.navigate('Edicion', { idEvent, token, idUser, evento })}
-                >
-                    <Text style={styles.buttonText}>Editar Evento</Text>
-                </TouchableOpacity>
+            <View>
+                <BotonSecundario 
+                    text={'Atrás'} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
+                />
+                <Boton 
+                    text={'Inscribirse'} 
+                    onPress={enroll} 
+                /> 
             </View>
-
         </View>
     );
 }
@@ -102,60 +85,26 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F9FAFB', // Fondo claro
-        justifyContent: 'center', // Centrado vertical
-        alignItems: 'center', // Centrado horizontal
+        backgroundColor: '#f8f9fa',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     datosEvento: {
         width: '100%',
-        maxWidth: 600, // Máximo ancho para pantallas grandes
+        maxWidth: 600, 
         padding: 15,
-        backgroundColor: '#ffffff', // Fondo blanco
-        borderRadius: 10, // Bordes redondeados
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 5, // Sombra ligera para dar profundidad
-        marginBottom: 20, // Espacio entre los elementos
+        elevation: 5,
+        marginBottom: 20,
     },
     text: {
         fontSize: 16,
-        color: '#333', // Texto oscuro para mejor contraste
-        marginVertical: 5, // Espaciado entre los textos
+        color: '#333',
+        marginVertical: 5,
     },
-    buttonsContainer: {
-        width: '100%',
-        marginTop: 20,
-        flexDirection: 'row', // Alineación horizontal de los botones
-        justifyContent: 'space-between', // Espaciado entre los botones
-    },
-    button: {
-        flex: 1,
-        backgroundColor: '#4CAF50', // Color verde para el botón principal
-        paddingVertical: 15,
-        borderRadius: 10,
-        marginBottom: 15,
-        alignItems: 'center', // Alineación del texto al centro
-        justifyContent: 'center', // Centrar contenido
-    },
-    enrollButton: {
-        backgroundColor: '#4CAF50', // Botón de inscripción con verde
-    },
-    buttonText: {
-        color: 'white', // Texto blanco para los botones
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    // Estilo del botón de flecha
-    backButton: {
-        position: 'absolute', // Fijar el botón en la parte superior
-        left: 20, // Desplazarlo desde la izquierda
-        top: 20, // Colocarlo en la parte superior
-        backgroundColor: '#4CAF50', // Fondo verde
-        borderRadius: 50, // Redondeo del botón
-        padding: 10, // Espaciado pequeño alrededor del ícono
-        alignItems: 'center', // Alineación del ícono al centro
-        justifyContent: 'center', // Centrado del ícono
-    },
-});
+})

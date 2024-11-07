@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import Boton from '../components/Boton';
+import BotonSecundario from '../components/BotonSecundario';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
 
@@ -22,9 +24,10 @@ export default function Index() {
     }
 
     const canAddAttendant = async (event) => {
+    {
         const enlistados = await get('event/enrollment/' + event.id.toString());
         return enlistados.length < event.maxAssistant;
-    }
+    }}
 
     const fetchEventos = async () => {
         try {
@@ -45,116 +48,65 @@ export default function Index() {
     }, []);
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             <Text style={styles.title}>Próximos Eventos</Text>
-            
-            {/* Cards de eventos */}
-            <View style={styles.eventsContainer}>
-                {eventos.filter(isDateFuture).map((item) => (
-                    <View key={item.id} style={styles.eventCard}>
-                        <Text 
-                            style={styles.eventCardTitle} 
-                            onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}
-                        >
-                            {item.name}
-                        </Text>
-                        <Text style={styles.eventDate}>{new Date(item.start_date).toLocaleDateString()}</Text>
+            <FlatList
+                data={eventos.filter(isDateFuture)}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.eventContainer}>
+                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}>{item.name}</Text>
+                        {/* <Text style={styles.eventTitle} onPress={() => console.log('a ver este item.id: ', item.id)}> {item.name} </Text> */}
+                        <Text>{item.start_date}</Text>
                         {canAddAttendant(item)
-                            ? <Text style={styles.attendantText}>¡Puedes unirte!</Text>
+                            ? <Text style={styles.attendantText}>Podes unirte</Text>
                             : <Text style={styles.attendantText}>Entradas agotadas</Text>}
                     </View>
-                ))}
-            </View>
+                )}
+                contentContainerStyle={styles.listContainer}
 
-            {/* Botones */}
-            <TouchableOpacity 
-                style={styles.primaryButton} 
-                onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
-            >
-                <Text style={styles.primaryButtonText}>Crear nuevo evento</Text>
-            </TouchableOpacity>
-
+            />
+            <Boton text={"Crear nuevo evento"} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })} />
             {id === 92 || id === 50 ? (
-                <TouchableOpacity 
-                    style={styles.secondaryButton} 
-                    onPress={() => navigation.navigate("Panel", { token: token })}
-                >
-                    <Text style={styles.secondaryButtonText}>Ver todos los eventos</Text>
-                </TouchableOpacity>
+            <BotonSecundario text="Ver todos los eventos" onPress={() => navigation.navigate("Panel", { token: token })} />
             ) : null}
-        </ScrollView>
+
+        </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9FAFB',
+        backgroundColor: '#F8F9FD',
         padding: 20,
     },
     title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#333',
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    eventsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        marginBottom: 30,
-    },
-    eventCard: {
-        backgroundColor: '#ffffff',
-        borderRadius: 10,
-        width: '48%',
-        padding: 15,
-        marginBottom: 20,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        marginRight: '2%',
-    },
-    eventCardTitle: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 24,
+        fontWeight: 'bold',
         color: '#333',
         marginBottom: 10,
+        textAlign: 'center',
     },
-    eventDate: {
-        fontSize: 14,
+    subtitle: {
+        fontSize: 16,
         color: '#555',
+        marginBottom: 30,
+        textAlign: 'center',
     },
-    attendantText: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginTop: 10,
-        color: '#FF5733', // Naranja para "entradas agotadas"
+    listContainer: {
+        paddingBottom: 20,
     },
-    primaryButton: {
-        backgroundColor: '#4CAF50',
-        paddingVertical: 15,
-        borderRadius: 10,
-        marginBottom: 15,
-        alignItems: 'center',
+    eventContainer: {
+        padding: 15,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        marginBottom: 10,
+        elevation: 1,
     },
-    primaryButtonText: {
-        color: '#fff',
+    eventTitle: {
         fontSize: 18,
-        fontWeight: '700',
-    },
-    secondaryButton: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    secondaryButtonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '700',
+        fontWeight: 'bold',
     },
 });

@@ -41,6 +41,21 @@ export const getAuth = async(endpoint, credentials) => {
   }
 }
 
+export const deleteAuth = async(endpoint, credentials) => {
+  try{
+    const response = await api.delete(endpoint, {headers: {
+      'Authorization': `Bearer ${credentials}`}
+    });
+    return response.data;
+  }
+  catch(error)
+  {
+    console.error('Error en el delete: ', error);
+    console.error('Endpoint: ', endpoint)
+    throw error;
+  }
+}
+
 export const get = async(endpoint) => {
   try{
     const response = await api.get(endpoint);
@@ -96,17 +111,23 @@ export const getLocations = async (credentials) => {
   }
 };
 
-export const getEventos = async(credentials) => {
+export const getEventos = async (credentials) => {
   try {
-    const response = await api.get('event', {headers: {
-      'Authorization': `Bearer ${credentials}`}
-  });
+    const response = await api.get('event', {
+      headers: {
+        'Authorization': `Bearer ${credentials}`
+      },
+      params: {
+        limit: 100
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error en el fetch de los eventos:', error);
     throw error;
   }
 }
+
 
 export const createEvent = async(credentials) => {
   try{
@@ -117,29 +138,3 @@ export const createEvent = async(credentials) => {
     throw error;
   }
 }
-
-export const updateEventApi = async (idEvent, updatedData, token) => {
-  try {
-    // Verifica que el token esté disponible
-    if (!token) {
-      throw new Error("Token de autenticación no proporcionado");
-    }
-
-    console.log('Llegó a updateEventApi de AuthService');
-
-    // Realiza la solicitud PUT para actualizar el evento, enviando los datos en el cuerpo de la solicitud
-    const response = await api.put(`event/${idEvent}`, updatedData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',  // Asegúrate de indicar que el cuerpo es JSON
-      },
-    });
-
-    console.log("Evento actualizado:", response);
-
-    return response.data;  // Devuelve la respuesta de la API
-  } catch (error) {
-    console.error('Error en la actualización del evento:', error);
-    throw error; // Lanza el error para manejarlo en otro lugar si es necesario
-  }
-};

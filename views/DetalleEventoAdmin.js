@@ -1,18 +1,51 @@
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import React from 'react';
+import BotonSecundario from '../components/BotonSecundario';
+import Boton from '../components/Boton';
+import Title from '../components/Title';
+import React, { useState, useEffect } from 'react';
+import { get, deleteAuth } from '../authService';
 
 export default function DetalleEventoAdmin() {
     const navigation = useNavigation();
     const saludo = "Detalle del evento";
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
+    const [inscriptos, setInscriptos] = useState([]);
+
+    const fetchInscriptos = async () => {
+        try {
+            const data = await get('event/enrollment/' + idEvent);
+            setInscriptos(data);
+        } catch (error) {
+            console.error('Error al cargar los inscriptos:', error);
+        }
+    };
+
+    const eliminarEvento = async () => {
+        const confirmacion = window.confirm("¿Querés eliminar el evento?");
+    
+        if (confirmacion) {
+            try {
+                await deleteAuth(`event/${evento.id}`, token);
+                alert("Evento eliminado con éxito.");
+            } catch (error) {
+                console.error("Error al eliminar el evento:", error);
+                alert("Hubo un problema al eliminar el evento.");
+            }
+        }
+    };
+    
+
+    useEffect(() => {
+        fetchInscriptos();
+    }, []);
 
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida',
+        'Categoria': evento.id_event_category || 'Desconocida', // se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
         'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
@@ -24,32 +57,44 @@ export default function DetalleEventoAdmin() {
 
     return (
         <View style={styles.container}>
-            {/* Reemplazo de Title por un Text normal */}
-            <Text style={styles.title}>{saludo}</Text>
-
-            <View style={styles.datosEvento}>
+            <Title text={saludo} />
+            <View style={[styles.card, styles.cardData]}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
                         {`${key}: ${value}`}
                     </Text>
                 ))}
             </View>
-
-            <View style={styles.buttonsContainer}>
-                {/* Reemplazo de BotonSecundario por TouchableOpacity */}
-                <TouchableOpacity 
-                    style={[styles.button, styles.backButton]} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}>
-                    <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
-
-                {/* Solo mostramos el botón de "Editar" si la fecha del evento es posterior a la fecha actual */}
+            <View style={styles.card}>
+                <h2 style={styles.tituloCard}>Inscriptos</h2>
+                <FlatList
+                    data={inscriptos}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <View>
+                            <Text style={styles.text}>{item.username}</Text>
+                        </View>
+                    )}
+                    contentContainerStyle={styles.listContainer}
+                    style={styles.flatList}
+                />
+            </View>
+            <View style={styles.containerBotones}>
+                <BotonSecundario 
+                    text={'Atrás'} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
+                />
                 {fechaInicioEvento > fechaActual ? (
-                    <TouchableOpacity 
-                        style={[styles.button, styles.editButton]} 
-                        onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })}>
-                        <Text style={styles.buttonText}>Editar</Text>
-                    </TouchableOpacity>
+                    <>
+                        <Boton 
+                            text={'Editar'} 
+                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })} 
+                        />
+                        <Boton
+                            text={'Eliminar'}
+                            onPress={eliminarEvento}
+                        />
+                    </>
                 ) : null}
             </View>
         </View>
@@ -64,15 +109,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
+    containerBotones: {
+        flexDirection: 'row',
+        width: '10%',
+        maxWidth: 600,
+        marginTop: 20,
+        left: -120
     },
-    datosEvento: {
+    card: {
         width: '100%',
-        maxWidth: 600, 
+        maxWidth: 600,
         padding: 15,
         backgroundColor: '#ffffff',
         borderRadius: 10,
@@ -83,36 +129,25 @@ const styles = StyleSheet.create({
         elevation: 5,
         marginBottom: 20,
     },
+    cardData: {
+        height: 'fit-content',
+    },
+    tituloCard: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 30,
+        color: 'rgb(16, 137, 211)',
+    },
     text: {
         fontSize: 16,
         color: '#333',
-        marginVertical: 5,
+        marginVertical: 2.5,
     },
-    buttonsContainer: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
+    listContainer: {
+        paddingBottom: 20,
     },
-    button: {
-        flex: 1,
-        paddingVertical: 15,
-        marginHorizontal: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    backButton: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: '#007BFF',
-    },
-    editButton: {
-        backgroundColor: '#007BFF',
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
+    flatList: {
+        maxHeight: '50%',
     },
 });
+
