@@ -4,9 +4,9 @@ import { api } from './api';
 export const postAuth = async (endpoint, body, token) => {
   try {
     const response = await api.post(endpoint, body, {
-      headers: {
+      /*headers: {
         Authorization: `Bearer ${token}`
-      }
+      }*/
     });
     return response.data;
   } catch (error) {
@@ -27,6 +27,19 @@ export const post = async (endpoint) => {
     throw error;
   }
 };
+
+//put
+export const putEvento = async (endpoint) => {
+    try {
+      const response = await api.put('/eventos', endpoint); // Asegúrate de pasar el endpoint correcto
+      return response.data;
+  } catch (error) {
+      console.error('Error al hacer PUT:', error);
+      throw error;
+  }
+};
+
+
 //get credenciales
 export const getAuth = async(endpoint, credentials) => {
   try {

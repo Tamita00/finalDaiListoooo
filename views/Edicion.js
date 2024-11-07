@@ -8,9 +8,9 @@ import { getCategories, getLocations } from '../authService';
 export default function Edicion() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { token, eventoAEditar, idUser } = route.params;
+    const {idEvent,  token, idUser, nombre, evento } = route.params;
 
-    const [nombre, setNombre] = useState("");
+    const [nombreE, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [duracion, setDuracion] = useState("");
     const [precio, setPrecio] = useState("");
@@ -20,7 +20,7 @@ export default function Edicion() {
     const [locations, setLocations] = useState([]);
     const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-
+    let [eventoAEditar, setEventoAEditar] = useState([]);
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -57,8 +57,8 @@ export default function Edicion() {
     );
 
     const handleGuardar = () => {
-        const eventoEditado = {
-            'name': nombre,
+        eventoAEditar = {
+            'name': nombreE,
             'description': descripcion,
             'id_event_category': idSelectedCategory,
             'id_event_location': idSelectedLocation,
@@ -69,7 +69,8 @@ export default function Edicion() {
             'max_assistance': asistenciaMax,
             "id_creator_user": idUser
         };
-        navigation.navigate('Confirmacion', { eventoEditado, token, categories, locations, idUser });
+        console.log("llego a handleGuardar");
+        navigation.navigate('Confirmacion', { eventoAEditar, token, categories, locations, nombre, idUser });
     };
 
     const handleDateChange = (newDate) => {
@@ -80,7 +81,7 @@ export default function Edicion() {
     return (
         <View style={styles.container}>
             {/* Flecha para regresar */}
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Panel', { token, id: idUser })}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Panel', { token, idUser: idUser })}>
                 <Ionicons name="arrow-back" size={30} color="#757575" />
             </TouchableOpacity>
 
@@ -88,7 +89,7 @@ export default function Edicion() {
 
             <TextInput
                 style={styles.input}
-                placeholder={eventoAEditar.name}
+                placeholder={nombreE}
                 value={nombre}
                 onChangeText={setNombre}
             />
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
         color: '#888',
     },
     button: {
-        width: '100%',
+        width: '40%',
         padding: 15,
         backgroundColor: '#4CAF50',
         borderRadius: 10,

@@ -1,23 +1,25 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import React from 'react';
-import { postAuth } from './../authService';
+import { putEvento } from './../authService';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
 
 export default function Confirmacion() {
     const navigation = useNavigation();
     const route = useRoute(); 
-    const { eventoACrear, token, categories, locations, nombre_user, idUser } = route.params;
+    const { eventoAEditar, token, categories, locations, nombre, idUser } = route.params;
 
-    const selectedCategory = categories.find((category) => category.id === eventoACrear.id_event_category);
-    const selectedLocation = locations.find((location) => location.id === eventoACrear.id_event_location);
+    const selectedCategory = categories.find((category) => category.id === eventoAEditar.id);
+    console.log(eventoAEditar, token, categories, locations, nombre, idUser);
+    const selectedLocation = locations.find((location) => location.id === eventoAEditar.id_event_location);
     
     const guardarEvento = async () => {
         try {
-            if (!eventoACrear) {
+            if (!eventoAEditar) {
                 throw new Error("Evento no válido");
             }
-            await postAuth('event/', eventoACrear, token);
+            await putEvento('event/', eventoAEditar, token);
+            //await postAuth('event/', eventoAEditar, token);
             Alert.alert('Éxito', 'Tu evento ha sido creado con éxito!');
             navigation.navigate("Index", { nombre: nombre_user, token });
         } catch (error) {
@@ -27,14 +29,14 @@ export default function Confirmacion() {
     };
 
     const eventoNuevo = {
-        'Nombre': eventoACrear.name,
-        'Descripción': eventoACrear.description,
+        'Nombre': eventoAEditar.name,
+        'Descripción': eventoAEditar.description,
         'Categoría': selectedCategory ? selectedCategory.name : 'No especificada',
         'Localidad': selectedLocation ? selectedLocation.name : 'No especificada',
-        'Fecha inicio': new Date(eventoACrear.start_date).toLocaleString(),
-        'Duración en minutos': eventoACrear.duration_in_minutes,
-        'Precio': `$${eventoACrear.price}`,
-        'Asistencia máxima': eventoACrear.max_assistance,
+        'Fecha inicio': new Date(eventoAEditar.start_date).toLocaleString(),
+        'Duración en minutos': eventoAEditar.duration_in_minutes,
+        'Precio': `$${eventoAEditar.price}`,
+        'Asistencia máxima': eventoAEditar.max_assistance,
     };
 
     return (

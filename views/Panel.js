@@ -7,7 +7,8 @@ import { getEventos } from '../authService';
 export default function Panel() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { token } = route.params;
+    const { token: token, idUser: id, nombre_user: nombre } = route.params;
+    
     const [eventos, setEventos] = useState([]);
 
     // Función para verificar si la fecha es futura
@@ -50,6 +51,8 @@ export default function Panel() {
                                         idEvent: item.id,
                                         evento: item,
                                         token: token,
+                                        idUser: id, 
+                                        nombre: nombre
                                     })
                                 }
                             >

@@ -74,7 +74,7 @@ export default function Index() {
                 {id === 34 || id === 36 ? (
                     <button 
                         style={{ ...styles.boton, ...styles.verTodos }} 
-                        onClick={() => navigation.navigate("Panel", { token: token })}
+                        onClick={() => navigation.navigate("Panel", {token: token, idUser: id, nombre_user: nombre })}
                     >
                         Ver todos
                     </button>

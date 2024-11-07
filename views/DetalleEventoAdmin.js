@@ -7,7 +7,8 @@ import { get, deleteAuth } from '../authService';
 export default function DetalleEventoAdmin() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { idEvent, token, idUser, evento } = route.params;
+    const { idEvent, token, idUser, nombre, evento } = route.params;
+    
     const [inscriptos, setInscriptos] = useState([]);
 
     const fetchInscriptos = async () => {
@@ -94,7 +95,7 @@ export default function DetalleEventoAdmin() {
                     <>
                         <TouchableOpacity
                             style={[styles.button, styles.buttonEdit]}
-                            onPress={() => navigation.navigate('Edicion', { idEvent, token, id: idUser, eventoAEditar: evento })}
+                            onPress={() => navigation.navigate('Edicion', { idEvent, token, idUser: idUser, nombre: nombre, evento: evento })}
                         >
                             <Text style={styles.buttonText}>Editar</Text>
                         </TouchableOpacity>
