@@ -43,6 +43,7 @@ export default function Confirmacion() {
                 {Object.entries(eventoNuevo).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
                         {`${key}: ${value}`}
+                        {`${key}: ${value}`}
                     </Text>
                 ))}
             </View>
