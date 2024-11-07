@@ -1,39 +1,33 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import CustomTextInput from '../components/textInput';
-import NumberInput from '../components/numberInput';
 import { Dropdown } from 'react-native-element-dropdown';
-import { getCategories, getLocations, postAuth } from '../authService';
-import DateInput from '../components/dateInput';
-import BotonSecundario from '../components/BotonSecundario';
+import { getCategories, getLocations } from '../authService';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function Formulario() {
     const navigation = useNavigation();
     
-    const [ nombre, setNombre ] = useState("");
-    const [ descripcion, setDescripcion ] = useState("");
-    const [ duracion, setDuracion ] = useState("");
-    const [ precio, setPrecio ] = useState("");
-    const [ asistenciaMax, setAsistenciaMax ] = useState("");
-    // const [showDatePicker, setShowDatePicker] = useState(false);
-    const [ eventDate, setEventDate] = useState("");
-    
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
+    const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [duracion, setDuracion] = useState("");
+    const [precio, setPrecio] = useState("");
+    const [asistenciaMax, setAsistenciaMax] = useState("");
+    const [eventDate, setEventDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
     const [idSelectedCategory, idSetSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-    
+
     const route = useRoute();
     const { token, idUser, nombre_user } = route.params;  
-    console.log(idUser);
 
     const renderItem = (item) => (
         <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.start_date}</Text>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.itemDate}>{item.start_date}</Text>
         </View>
     );
 
@@ -60,32 +54,75 @@ export default function Formulario() {
         fetchLocations();
     }, [token]);
 
-    function handleGuardar(){
+    function handleGuardar() {
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
             'id_event_category': idSelectedCategory,
             'id_event_location': idSelectedLocation,
-            'start_date': eventDate,
+            'start_date': eventDate.toISOString(),
             'duration_in_minutes': duracion,
             'price': precio,
             "enabled_for_enrollment": 1,
             'max_assistance': asistenciaMax,
             "id_creator_user": idUser
-        }
-        navigation.navigate('Confirmacion', {eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser});
-        console.log(eventoACrear);
+        };
+        navigation.navigate('Confirmacion', { eventoACrear, token, categories, locations, nombre_user, idUser });
     }
 
     return (
         <View style={styles.container}>
-            <Title text="Crear un nuevo evento" />
-            <CustomTextInput placeholder="Nombre" value={nombre} onChangeText={setNombre}/>
-            <CustomTextInput placeholder="Descripción" value={descripcion} onChangeText={setDescripcion}/>
-            <NumberInput placeholder="Duración en minutos" value={duracion} onChange={setDuracion}/>
-            <NumberInput placeholder="Precio" value={precio} onChange={setPrecio}/>
-            <NumberInput placeholder="Asistencia máxima" value={asistenciaMax} onChange={setAsistenciaMax}/>
-            <DateInput date={eventDate} setFecha={setEventDate}/>
+            <Text style={styles.title}>Crear un nuevo evento</Text>
+            <TextInput 
+                style={styles.input} 
+                placeholder="Nombre" 
+                value={nombre} 
+                onChangeText={setNombre} 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Descripción" 
+                value={descripcion} 
+                onChangeText={setDescripcion} 
+                multiline 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Duración en minutos" 
+                value={duracion} 
+                onChangeText={setDuracion} 
+                keyboardType="numeric" 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Precio" 
+                value={precio} 
+                onChangeText={setPrecio} 
+                keyboardType="numeric" 
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder="Asistencia máxima" 
+                value={asistenciaMax} 
+                onChangeText={setAsistenciaMax} 
+                keyboardType="numeric" 
+            />
+
+            <TouchableOpacity style={styles.datePicker} onPress={() => setShowDatePicker(true)}>
+                <Text style={styles.dateText}>{eventDate.toDateString()}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+                <DateTimePicker
+                    value={eventDate}
+                    mode="date"
+                    display="default"
+                    onChange={(event, date) => {
+                        setShowDatePicker(false);
+                        if (date) setEventDate(date);
+                    }}
+                />
+            )}
+
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={categories}
@@ -93,12 +130,11 @@ export default function Formulario() {
                     valueField="id"
                     placeholder="Categoría"
                     value={idSelectedCategory}
-                    onChange={(item) => {
-                        idSetSelectedCategory(item.id);
-                    }}
+                    onChange={(item) => idSetSelectedCategory(item.id)}
                     renderItem={(item) => renderItem(item)}
                 />
             </View>
+
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={locations}
@@ -106,14 +142,16 @@ export default function Formulario() {
                     valueField="id"
                     placeholder="Localidad"
                     value={idSelectedLocation}
-                    onChange={(item) => {
-                        setIdSelectedLocation(item.id);
-                    }}
+                    onChange={(item) => setIdSelectedLocation(item.id)}
                     renderItem={(item) => renderItem(item)}
                 />
             </View>
-            <Boton text={"Guardar"} onPress={handleGuardar} />
-            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Index', { token: token, id: idUser})}/>
+
+            <TouchableOpacity style={styles.button} onPress={handleGuardar}>
+                <Text style={styles.buttonText}>Guardar</Text>
+            </TouchableOpacity>
+
+            <Button title="Atrás" onPress={() => navigation.navigate('Index', { token, id: idUser })} color="#757575" />
         </View>
     );
 }
@@ -121,54 +159,66 @@ export default function Formulario() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f3f4f6',
         padding: 20,
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: '600',
+        color: '#212121',
+        textAlign: 'center',
+        marginVertical: 20,
+    },
+    input: {
+        width: '100%',
+        height: 50,
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        fontSize: 16,
+        marginBottom: 15,
+        borderColor: '#ddd',
+        borderWidth: 1,
+    },
+    datePicker: {
+        width: '100%',
+        paddingVertical: 15,
+        paddingHorizontal: 15,
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        justifyContent: 'center',
+        borderColor: '#ddd',
+        borderWidth: 1,
+        marginBottom: 15,
+    },
+    dateText: {
+        fontSize: 16,
+        color: '#666',
     },
     dropdownContainer: {
         width: '100%',
-        backgroundColor: 'white',
-        borderWidth: 0,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3, 
-        shadowRadius: 10,
-        elevation: 5,
-        borderColor: 'transparent',
-        fontSize: 16
+        marginBottom: 15,
+        borderRadius: 8,
+        overflow: 'hidden',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333', 
-        marginBottom: 20,
-    },
-    boton: {
-        backgroundColor: '#4CAF50', 
+    button: {
+        backgroundColor: '#4CAF50',
         paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 5,
-        elevation: 3, 
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 20,
     },
-    botonText: {
-        color: '#fff',
+    buttonText: {
+        color: '#ffffff',
         fontSize: 18,
-        textAlign: 'center',
+        fontWeight: '600',
     },
     item: {
         padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
         backgroundColor: '#f9f9f9',
     },
     itemText: {
         fontSize: 16,
-        fontWeight: 'bold',
         color: '#333',
     },
     itemDate: {

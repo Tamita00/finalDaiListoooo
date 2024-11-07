@@ -101,6 +101,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
+        width:"5em"
     },
     eventContainer: {
         padding: '15px',

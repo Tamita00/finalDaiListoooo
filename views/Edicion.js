@@ -1,29 +1,23 @@
+
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
 import React, { useState, useEffect } from 'react';
-import CustomTextInput from '../components/textInput';
-import NumberInput from '../components/numberInput';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getCategories, getLocations } from '../authService';
-import DateInput from '../components/dateInput';
-import BotonSecundario from '../components/BotonSecundario';
 
 export default function Edicion() {
     const navigation = useNavigation();
     const route = useRoute();
     const { token, eventoAEditar, idUser } = route.params;
     
-    const [ nombre, setNombre ] = useState("");
-    const [ descripcion, setDescripcion ] = useState("");
-    const [ duracion, setDuracion ] = useState("");
-    const [ precio, setPrecio ] = useState("");
-    const [ asistenciaMax, setAsistenciaMax ] = useState("");
-    const [ eventDate, setEventDate] = useState("");  // Este es el estado de la fecha
-    
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
+    const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [duracion, setDuracion] = useState("");
+    const [precio, setPrecio] = useState("");
+    const [asistenciaMax, setAsistenciaMax] = useState("");
+    const [eventDate, setEventDate] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
     const [idSelectedCategory, setIdSelectedCategory] = useState(null);
     const [idSelectedLocation, setIdSelectedLocation] = useState(null);
 
@@ -40,7 +34,7 @@ export default function Edicion() {
             'description': descripcion,
             'id_event_category': idSelectedCategory,
             'id_event_location': idSelectedLocation,
-            'start_date': eventDate,  // Fecha formateada (ISO 8601)
+            'start_date': eventDate,
             'duration_in_minutes': duracion,
             'price': precio,
             "enabled_for_enrollment": 1,
@@ -48,12 +42,11 @@ export default function Edicion() {
             "id_creator_user": idUser
         };
         navigation.navigate('Confirmacion', { eventoEditado, token, categories, locations, idUser });
-        console.log(eventoEditado);
     };
 
     const handleDateChange = (newDate) => {
-        const formattedDate = new Date(newDate).toISOString();  // Convertimos la fecha al formato ISO
-        setEventDate(formattedDate);  // Actualizamos el estado con la fecha formateada
+        const formattedDate = new Date(newDate).toISOString();
+        setEventDate(formattedDate);
     };
 
     useEffect(() => {
@@ -75,28 +68,57 @@ export default function Edicion() {
             }
         };
 
-        console.log('eventoAEditar.start_date', eventoAEditar.start_date);
         fetchCategories();
         fetchLocations();
 
-        // Formateamos la fecha al recibirla de eventoAEditar
         if (eventoAEditar?.start_date) {
-            const formattedDate = new Date(eventoAEditar.start_date).toLocaleDateString('es-ES');  // Aquí puedes elegir el formato que prefieras
-            console.log("formattedDate:", formattedDate);
-            setEventDate(formattedDate);  // Establecemos la fecha en el estado
+            const formattedDate = new Date(eventoAEditar.start_date).toLocaleDateString('es-ES');
+            setEventDate(formattedDate);
         }
-    }, [eventoAEditar, token]);  // Dependemos de eventoAEditar y token para recargar los datos
+    }, [eventoAEditar, token]);
 
     return (
         <View style={styles.container}>
-            <Title text='Editar evento' />
-            <CustomTextInput placeholder={eventoAEditar.name} value={nombre} onChangeText={setNombre} />
-            <CustomTextInput placeholder="Descripción" value={eventoAEditar.description} onChangeText={setDescripcion} />
-            <NumberInput placeholder="Duración en minutos" value={eventoAEditar.duration_in_minutes} onChange={setDuracion} />
-            <NumberInput placeholder="Precio" value={eventoAEditar.price} onChange={setPrecio} />
-            <NumberInput placeholder="Asistencia máxima" value={eventoAEditar.max_assistance} onChange={setAsistenciaMax} />
-            <DateInput fecha={eventoAEditar.start_date} setFecha={handleDateChange} />
-            
+            <Text style={styles.title}>Editar evento</Text>
+            <TextInput
+                style={styles.input}
+                placeholder={eventoAEditar.name}
+                value={nombre}
+                onChangeText={setNombre}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={descripcion}
+                onChangeText={setDescripcion}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Duración en minutos"
+                value={duracion}
+                keyboardType="numeric"
+                onChangeText={setDuracion}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Precio"
+                value={precio}
+                keyboardType="numeric"
+                onChangeText={setPrecio}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Asistencia máxima"
+                value={asistenciaMax}
+                keyboardType="numeric"
+                onChangeText={setAsistenciaMax}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Fecha del evento"
+                value={eventDate}
+                onChangeText={handleDateChange}
+            />
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     value={eventoAEditar.id_event_category}
@@ -125,8 +147,12 @@ export default function Edicion() {
                 />
             </View>
 
-            <Boton text={"Guardar"} onPress={handleGuardar} />
-            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Panel', { token: token, id: idUser })} />
+            <TouchableOpacity style={styles.button} onPress={handleGuardar}>
+                <Text style={styles.buttonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Panel', { token: token, id: idUser })}>
+                <Text style={styles.buttonSecondaryText}>Atrás</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -139,12 +165,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 20,
+    },
+    input: {
+        width: '100%',
+        padding: 15,
+        marginVertical: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        backgroundColor: '#fff',
+    },
     dropdownContainer: {
         width: '100%',
-        backgroundColor: 'white',
-        borderWidth: 0,
         paddingVertical: 10,
         paddingHorizontal: 20,
+        backgroundColor: '#fff',
         borderRadius: 20,
         marginTop: 15,
         shadowColor: '#0060DD',
@@ -152,8 +192,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 5,
-        borderColor: 'transparent',
-        fontSize: 16
     },
     item: {
         padding: 10,
@@ -169,7 +207,29 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#888',
     },
-    secundario: {
+    button: {
+        width: '100%',
+        padding: 15,
+        backgroundColor: '#4CAF50',
+        borderRadius: 10,
+        alignItems: 'center',
         marginTop: 20,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    buttonSecondary: {
+        width: '100%',
+        padding: 15,
+        backgroundColor: '#ccc',
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    buttonSecondaryText: {
+        color: '#333',
+        fontSize: 16,
     },
 });
