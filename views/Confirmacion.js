@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     noButton: {
-        backgroundColor: '#bd0003',
-        borderColor: '#bd0003',
+        backgroundColor: '#D32F2F',
+        borderColor: '#D32F2F',
         borderWidth: 2,
     },
     siButton: {
