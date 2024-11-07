@@ -1,7 +1,8 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import React from 'react';
 import { postAuth } from './../authService';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
 
 export default function Confirmacion() {
     const navigation = useNavigation();
@@ -37,16 +38,27 @@ export default function Confirmacion() {
     };
 
     return (
-        <View style={[styles.container, styles.boxShadow]}>
+        <View style={styles.container}>
+            {/* Botón de flecha para volver */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()} // Navega hacia atrás
+            >
+                <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+            {/* Título */}
             <Text style={styles.title}>¿Querés publicar este evento?</Text>
-            <View style={styles.datosEvento}>
+
+            {/* Detalles del evento */}
+            <View style={styles.eventDetails}>
                 {Object.entries(eventoNuevo).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
-                        {`${key}: ${value}`}
                         {`${key}: ${value}`}
                     </Text>
                 ))}
             </View>
+
+            {/* Botones de Confirmación */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity 
                     style={[styles.button, styles.noButton]} 
@@ -68,35 +80,45 @@ export default function Confirmacion() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#F8F9FD',
         padding: 20,
-        backgroundColor: '#f8f9fa',
+        justifyContent: 'flex-start', // Alineación de elementos desde el inicio
+        alignItems: 'center', // Centramos todos los elementos horizontalmente
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        padding: 10,
+    },
+    arrowIcon: {
+        width: 25,
+        height: 25,
+        tintColor: '#34A853', // Verde
     },
     title: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
+        color: '#333', // Cambié el color a #333
+        textAlign: 'center',
+        marginVertical: 30,
     },
-    datosEvento: {
-        width: '100%',
-        maxWidth: 600,
-        backgroundColor: 'rgb(0, 123, 255)',
+    eventDetails: {
+        marginBottom: 30,
+        padding: 20,
+        backgroundColor: 'transparent', // Eliminado el contenedor verde
         borderRadius: 10,
-        padding: 25,
-        marginBottom: 20,
     },
     text: {
         fontSize: 16,
-        marginVertical: 4,
-        color: '#fff',
+        color: '#333', // Cambié el color a #333
+        marginBottom: 10,
+        textAlign: 'center', // Centrado del texto
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '80%',
-        maxWidth: 300,
+        justifyContent: 'space-evenly',
+        width: '100%',
     },
     button: {
         flex: 1,
@@ -107,22 +129,15 @@ const styles = StyleSheet.create({
     },
     noButton: {
         backgroundColor: 'transparent',
-        borderColor: '#007BFF',
-        borderWidth: 1,
+        borderColor: '#D32F2F', // Rojo
+        borderWidth: 2,
     },
     siButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#2C6B2F', // Verde
     },
     buttonText: {
         fontSize: 16,
         color: '#fff',
         fontWeight: 'bold',
-    },
-    boxShadow: {
-        shadowColor: 'grey',
-        shadowOffset: { width: 6, height: 6 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-        elevation: 16,
     },
 });

@@ -53,7 +53,7 @@ export default function Formulario() {
             'description': descripcion,
             'id_event_category': idSelectedCategory,
             'id_event_location': idSelectedLocation,
-            'start_date': eventDate.toISOString(),
+            'start_date': eventDate,
             'duration_in_minutes': duracion,
             'price': precio,
             "enabled_for_enrollment": 1,
@@ -72,6 +72,7 @@ export default function Formulario() {
 
             <Text style={styles.title}>Crear un nuevo evento</Text>
 
+            {/* Campos de texto */}
             <TextInput
                 style={styles.input}
                 placeholder="Nombre"
@@ -107,21 +108,23 @@ export default function Formulario() {
                 keyboardType="numeric"
             />
 
+            {/* Selector de fecha */}
             <TouchableOpacity style={styles.datePicker} onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.dateText}>{eventDate.toDateString()}</Text>
+                <Text style={styles.dateText}>{eventDate.toLocaleDateString()}</Text>
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={eventDate}
+                        mode="date"
+                        display="default"
+                        onChange={(event, date) => {
+                            setShowDatePicker(false);
+                            if (date) setEventDate(date);
+                        }}
+                    />
+                )}
             </TouchableOpacity>
-            {showDatePicker && (
-                <DateTimePicker
-                    value={eventDate}
-                    mode="date"
-                    display="default"
-                    onChange={(event, date) => {
-                        setShowDatePicker(false);
-                        if (date) setEventDate(date);
-                    }}
-                />
-            )}
 
+            {/* Dropdown para categorías */}
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={categories}
@@ -130,10 +133,11 @@ export default function Formulario() {
                     placeholder="Categoría"
                     value={idSelectedCategory}
                     onChange={(item) => idSetSelectedCategory(item.id)}
-                    renderItem={(item) => renderItem(item)}
+                    renderItem={renderItem}
                 />
             </View>
 
+            {/* Dropdown para localidades */}
             <View style={styles.dropdownContainer}>
                 <Dropdown
                     data={locations}
@@ -142,10 +146,11 @@ export default function Formulario() {
                     placeholder="Localidad"
                     value={idSelectedLocation}
                     onChange={(item) => setIdSelectedLocation(item.id)}
-                    renderItem={(item) => renderItem(item)}
+                    renderItem={renderItem}
                 />
             </View>
 
+            {/* Botón guardar */}
             <TouchableOpacity style={styles.button} onPress={handleGuardar}>
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
@@ -153,13 +158,14 @@ export default function Formulario() {
     );
 }
 
+// Función para renderizar cada item de los dropdowns
 const renderItem = (item) => (
     <View style={styles.item}>
         <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.start_date}</Text>
     </View>
 );
 
+// Estilos
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -230,9 +236,5 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 16,
         color: '#333',
-    },
-    itemDate: {
-        fontSize: 12,
-        color: '#666',
     },
 });
