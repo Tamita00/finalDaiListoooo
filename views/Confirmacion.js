@@ -47,7 +47,7 @@ export default function Confirmacion() {
                 <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             {/* Título */}
-            <Text style={styles.title}>¿Querés publicar este evento?</Text>
+            <Text style={styles.title}>Confirmar</Text>
 
             {/* Detalles del evento */}
             <View style={styles.eventDetails}>
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     noButton: {
-        backgroundColor: 'transparent',
-        borderColor: '#D32F2F', // Rojo
+        backgroundColor: '#bd0003',
+        borderColor: '#bd0003',
         borderWidth: 2,
     },
     siButton: {

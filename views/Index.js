@@ -56,7 +56,6 @@ export default function Index() {
                         >
                             {item.name}
                         </h2>
-                        <p>{item.start_date}</p>
                         {canAddAttendant(item)
                             ? <p style={styles.attendantText}>Únete</p>
                             : <p style={styles.attendantText}>No hay más entradas</p>}
