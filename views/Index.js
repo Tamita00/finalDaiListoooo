@@ -58,8 +58,8 @@ export default function Index() {
                         </h2>
                         <p>{item.start_date}</p>
                         {canAddAttendant(item)
-                            ? <p style={styles.attendantText}>Puedes unirte</p>
-                            : <p style={styles.attendantText}>Entradas agotadas</p>}
+                            ? <p style={styles.attendantText}>Únete</p>
+                            : <p style={styles.attendantText}>No hay más entradas</p>}
                     </div>
                 ))}
             </div>
@@ -68,15 +68,15 @@ export default function Index() {
                 style={{ ...styles.boton, ...styles.crearEvento }} 
                 onClick={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
             >
-                Crear nuevo evento
+                Crear
             </button>
 
             {id === 34 || id === 36 ? (
                 <button 
-                    style={{ ...styles.boton, ...styles.verTodos }} 
+                    style={{ ...styles.botonSecundario, ...styles.verTodos }} 
                     onClick={() => navigation.navigate("Panel", { token: token })}
                 >
-                    Ver todos los eventos
+                    Ver todos
                 </button>
             ) : null}
         </div>
@@ -101,6 +101,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
+        width:"5em"
     },
     eventContainer: {
         padding: '15px',
@@ -135,8 +136,11 @@ const styles = {
         backgroundColor: '#34A853',  // Botón verde para crear evento
     },
     verTodos: {
-        backgroundColor: 'transparent',
-        border: '2px solid #34A853',  // Borde verde para ver todos los eventos
+        backgroundColor: 'D5DBDB',
+        color: 'grey',
+        fontSize: 16,
+        fontWeight: 'bold',
+        border: 'F8F9FD',  // Borde verde para ver todos los eventos
     },
 };
 

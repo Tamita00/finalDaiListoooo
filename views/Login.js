@@ -112,11 +112,6 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: '#34A853',  // Verde
   },
-  registerButton: {
-    borderColor: '#34A853',  // Verde
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-  },
   botonText: {
     color: 'white',
     fontSize: 16,

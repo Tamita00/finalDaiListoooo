@@ -1,7 +1,8 @@
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
 import { registerUser } from '../authService';
-import React, { useState } from 'react';
 
 export default function Register() {
     const [nombre, setNombre] = useState('');
@@ -27,6 +28,14 @@ export default function Register() {
 
     return (
         <View style={styles.container}>
+            {/* Botón de retroceso */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()} // Navega hacia atrás
+            >
+                <Ionicons name="arrow-back" size={30} color="black" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Regístrate</Text>
             <View style={styles.inputContainer}>
                 <TextInput
@@ -57,10 +66,6 @@ export default function Register() {
                 <TouchableOpacity style={styles.button} onPress={handleRegister}>
                     <Text style={styles.buttonText}>Registrarse</Text>
                 </TouchableOpacity>
-                <Text style={styles.text}>¿Ya tienes cuenta?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.link}>Inicia sesión</Text>
-                </TouchableOpacity>
             </View>
         </View>
     );
@@ -68,13 +73,19 @@ export default function Register() {
 
 const styles = StyleSheet.create({
     container: {
-        width: '80%',
+        width: '100%',
         flex: 1,
         backgroundColor: '#F8F9FD',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-        paddingTop: 50,
+        paddingHorizontal: 20,
+        paddingTop: 60, // Ajuste de paddingTop para dar espacio al botón
+    },
+    backButton: {
+        position: 'absolute',
+        top: 30,  // Ajustamos la posición para mayor visibilidad
+        left: 20,
+        zIndex: 2, // Asegura que el botón esté por encima de otros elementos
     },
     title: {
         fontSize: 24,
