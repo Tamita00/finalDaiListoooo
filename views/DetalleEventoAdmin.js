@@ -1,9 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import BotonSecundario from '../components/BotonSecundario';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { get, deleteAuth } from '../authService';
 
@@ -24,19 +20,25 @@ export default function DetalleEventoAdmin() {
     };
 
     const eliminarEvento = async () => {
-        const confirmacion = window.confirm("¿Querés eliminar el evento?");
-    
-        if (confirmacion) {
-            try {
-                await deleteAuth(`event/${evento.id}`, token);
-                alert("Evento eliminado con éxito.");
-            } catch (error) {
-                console.error("Error al eliminar el evento:", error);
-                alert("Hubo un problema al eliminar el evento.");
-            }
-        }
+        Alert.alert(
+            "Confirmación",
+            "¿Querés eliminar el evento?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Eliminar", onPress: async () => {
+                        try {
+                            await deleteAuth(`event/${evento.id}`, token);
+                            Alert.alert("Evento eliminado con éxito.");
+                        } catch (error) {
+                            console.error("Error al eliminar el evento:", error);
+                            Alert.alert("Hubo un problema al eliminar el evento.");
+                        }
+                    }
+                }
+            ]
+        );
     };
-    
 
     useEffect(() => {
         fetchInscriptos();
@@ -45,7 +47,7 @@ export default function DetalleEventoAdmin() {
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida', // se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
+        'Categoria': evento.id_event_category || 'Desconocida',
         'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
@@ -57,7 +59,7 @@ export default function DetalleEventoAdmin() {
 
     return (
         <View style={styles.container}>
-            <Title text={saludo} />
+            <Text style={styles.title}>{saludo}</Text>
             <View style={[styles.card, styles.cardData]}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -66,7 +68,7 @@ export default function DetalleEventoAdmin() {
                 ))}
             </View>
             <View style={styles.card}>
-                <h2 style={styles.tituloCard}>Inscriptos</h2>
+                <Text style={styles.tituloCard}>Inscriptos</Text>
                 <FlatList
                     data={inscriptos}
                     keyExtractor={(item) => item.id.toString()}
@@ -80,22 +82,28 @@ export default function DetalleEventoAdmin() {
                 />
             </View>
             <View style={styles.containerBotones}>
-                <BotonSecundario 
-                    text={'Atrás'} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
-                />
-                {fechaInicioEvento > fechaActual ? (
+                <TouchableOpacity 
+                    style={[styles.button, styles.buttonSecondary]} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
+                >
+                    <Text style={styles.buttonText}>Atrás</Text>
+                </TouchableOpacity>
+                {fechaInicioEvento > fechaActual && (
                     <>
-                        <Boton 
-                            text={'Editar'} 
-                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })} 
-                        />
-                        <Boton
-                            text={'Eliminar'}
+                        <TouchableOpacity 
+                            style={styles.button} 
+                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, id: idUser, eventoAEditar: evento })}
+                        >
+                            <Text style={styles.buttonText}>Editar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.button} 
                             onPress={eliminarEvento}
-                        />
+                        >
+                            <Text style={styles.buttonText}>Eliminar</Text>
+                        </TouchableOpacity>
                     </>
-                ) : null}
+                )}
             </View>
         </View>
     );
@@ -109,12 +117,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 20,
+    },
     containerBotones: {
         flexDirection: 'row',
-        width: '10%',
+        width: '100%',
         maxWidth: 600,
         marginTop: 20,
-        left: -120
+        justifyContent: 'space-around',
     },
     card: {
         width: '100%',
@@ -135,8 +149,9 @@ const styles = StyleSheet.create({
     tituloCard: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 30,
+        fontSize: 20,
         color: 'rgb(16, 137, 211)',
+        marginBottom: 10,
     },
     text: {
         fontSize: 16,
@@ -149,5 +164,20 @@ const styles = StyleSheet.create({
     flatList: {
         maxHeight: '50%',
     },
+    button: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+        width: '45%',
+    },
+    buttonSecondary: {
+        backgroundColor: '#ccc',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
-

@@ -1,26 +1,28 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import BotonSecundario from '../components/BotonSecundario';
-import { postAuth } from '../authService';
-import { getCategories, getLocations, getAuth } from '../authService';
+import { postAuth, getCategories, getLocations } from '../authService';
 
 export default function DetalleEvento() {
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
     const navigation = useNavigation();
 
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
 
     const enroll = async () => {
-        const endpoint = 'event/' + idEvent + '/enrollment';
-        const enrollment = await postAuth(endpoint, evento, token);
-        console.log('enrollment.data', enrollment.data);
-        alert('Te registraste exitosamente! :D')
-        navigation.navigate('Index', { token: token, idUser: idUser});
-    }
+        try {
+            const endpoint = `event/${idEvent}/enrollment`;
+            await postAuth(endpoint, evento, token);
+            Alert.alert('Éxito', 'Te registraste exitosamente! :D');
+            navigation.navigate('Index', { token, idUser });
+        } catch (error) {
+            console.error('Error al inscribirse:', error);
+            Alert.alert('Error', 'No se pudo completar la inscripción');
+        }
+    };
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -44,15 +46,21 @@ export default function DetalleEvento() {
         fetchLocations();
     }, [token]);
 
-    console.log('id_event_category', evento.id_event_category);
-    console.log('categorías', categories); 
-    console.log('categorías sub id-event-category', categories[evento.id_event_category]); 
+    const getCategoryName = (categoryId) => {
+        const category = categories.find(cat => cat.id === categoryId);
+        return category ? category.name : 'Desconocida';
+    };
+
+    const getLocationName = (locationId) => {
+        const location = locations.find(loc => loc.id === locationId);
+        return location ? location.name : 'Desconocida';
+    };
 
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida', //se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
-        'Localidad': evento.id_event_location || 'Desconocida', 
+        'Categoria': getCategoryName(evento.id_event_category),
+        'Localidad': getLocationName(evento.id_event_location),
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -67,15 +75,19 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
-            <View>
-                <BotonSecundario 
-                    text={'Atrás'} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
-                />
-                <Boton 
-                    text={'Inscribirse'} 
-                    onPress={enroll} 
-                /> 
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                    style={[styles.button, styles.secondaryButton]} 
+                    onPress={() => navigation.navigate('Index', { token, idUser })}
+                >
+                    <Text style={styles.buttonText}>Atrás</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={styles.button} 
+                    onPress={enroll}
+                >
+                    <Text style={styles.buttonText}>Inscribirse</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -91,7 +103,7 @@ const styles = StyleSheet.create({
     },
     datosEvento: {
         width: '100%',
-        maxWidth: 600, 
+        maxWidth: 600,
         padding: 15,
         backgroundColor: '#ffffff',
         borderRadius: 10,
@@ -107,4 +119,26 @@ const styles = StyleSheet.create({
         color: '#333',
         marginVertical: 5,
     },
-})
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: 600,
+    },
+    button: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        flex: 1,
+        marginHorizontal: 5,
+    },
+    secondaryButton: {
+        backgroundColor: '#ccc',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+});
