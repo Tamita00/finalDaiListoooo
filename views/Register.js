@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#2C6B2F', // Verde
+        color: '#2C6B2F', 
         marginBottom: 20,
         textAlign: 'center',
     },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     button: {
         paddingVertical: 14,
         borderRadius: 8,
-        backgroundColor: '#34A853', // Verde
+        backgroundColor: '#34A853', 
         width: '100%',
         alignItems: 'center',
         marginVertical: 10,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     link: {
         fontSize: 14,
-        color: '#34A853', // Verde
+        color: '#34A853', 
         textDecorationLine: 'underline',
         marginTop: 5,
     },
