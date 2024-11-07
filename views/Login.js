@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    width: '100%',
+    width: '40%',
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   boton: {
-    width: '100%',
+    width: '40%',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
