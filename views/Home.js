@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#34A853',  // Botón verde para iniciar sesión
     },
     register: {
-        borderColor: '#34A853',  // Borde verde para registrarse
+        borderColor: '#F8F9FD',  // Borde verde para registrarse
         backgroundColor: '#D5DBDB',
         borderWidth: 1,
     },

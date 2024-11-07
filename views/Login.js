@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
+
 import { loginUser } from '../authService';
-import React, { useState } from 'react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -28,6 +30,13 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()} // Navega hacia atrás
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+
       <Text style={styles.title}>Inicio sesión</Text>
 
       <View style={styles.inputContainer}>
@@ -49,11 +58,6 @@ export default function Login() {
           <Text style={styles.botonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
 
-        <Text style={styles.textFooter}>¿No tienes cuenta?</Text>
-        
-        <TouchableOpacity style={[styles.boton, styles.registerButton]} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.botonText}>Regístrate</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -68,6 +72,12 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
     width: '100%',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1,
   },
   title: {
     fontSize: 24,
