@@ -190,7 +190,9 @@ const styles = StyleSheet.create({
     dropdownContainer: {
         width: '40%',
         paddingVertical: 10,
+        borderWidth: 1,
         paddingHorizontal: 20,
+        borderColor: '#ccc',
         backgroundColor: '#fff',
         borderRadius: 10,
         marginTop: 15,
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     buttonSecondary: {
-        width: '100%',
+        width: '40%',
         padding: 15,
         backgroundColor: '#ccc',
         borderRadius: 10,
