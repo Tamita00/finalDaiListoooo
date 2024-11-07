@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Importamos Ionicons
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getEventos } from '../authService';
 
 export default function Panel() {
@@ -10,13 +10,13 @@ export default function Panel() {
     const { token } = route.params;
     const [eventos, setEventos] = useState([]);
 
-    // Filtra eventos que son futuros
+    // Función para verificar si la fecha es futura
     function isDateFuture(event) {
         const hoy = new Date();
         return new Date(event.start_date) > hoy;
     }
 
-    // Obtener eventos desde el API
+    // Función para cargar los eventos
     const fetchEventos = async () => {
         try {
             const data = await getEventos(token);
@@ -27,68 +27,68 @@ export default function Panel() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchEventos();
-        };
-        fetchData();
+        fetchEventos();
     }, []);
 
     return (
         <View style={styles.container}>
-            {/* Flecha para volver atrás */}
+            {/* Botón de regreso */}
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={24} color="#333" />
             </TouchableOpacity>
 
-            <Text style={styles.title}>Próximos Eventos</Text>
-            <View style={styles.cardContainer}>
-                {eventos.filter(isDateFuture).map((item) => (
-                    <View key={item.id} style={styles.card}>
-                        <Text
-                            style={styles.cardTitle}
-                            onPress={() =>
-                                navigation.navigate('DetalleEventoAdmin', {
-                                    idEvent: item.id,
-                                    evento: item,
-                                    token: token,
-                                })
-                            }
-                        >
-                            {item.name}
-                        </Text>
-                        <Text style={styles.cardDate}>{item.start_date}</Text>
-                    </View>
-                ))}
-            </View>
+            {/* Contenedor de desplazamiento */}
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <Text style={styles.title}>Próximos Eventos</Text>
+                <View style={styles.cardContainer}>
+                    {eventos.filter(isDateFuture).map((item) => (
+                        <View key={item.id} style={styles.card}>
+                            <Text
+                                style={styles.cardTitle}
+                                onPress={() =>
+                                    navigation.navigate('DetalleEventoAdmin', {
+                                        idEvent: item.id,
+                                        evento: item,
+                                        token: token,
+                                    })
+                                }
+                            >
+                                {item.name}
+                            </Text>
+                            <Text style={styles.cardDate}>{item.start_date}</Text>
+                        </View>
+                    ))}
+                </View>
 
-            <Text style={styles.title}>Eventos Pasados</Text>
-            <View style={styles.cardContainer}>
-                {eventos.filter((event) => !isDateFuture(event)).map((item) => (
-                    <View key={item.id} style={styles.card}>
-                        <Text
-                            style={styles.cardTitle}
-                            onPress={() =>
-                                navigation.navigate('DetalleEventoAdmin', {
-                                    idEvent: item.id,
-                                    evento: item,
-                                    token: token,
-                                })
-                            }
-                        >
-                            {item.name}
-                        </Text>
-                        <Text style={styles.cardDate}>{item.start_date}</Text>
-                    </View>
-                ))}
-            </View>
+                <Text style={styles.title}>Eventos Pasados</Text>
+                <View style={styles.cardContainer}>
+                    {eventos.filter((event) => !isDateFuture(event)).map((item) => (
+                        <View key={item.id} style={styles.card}>
+                            <Text
+                                style={styles.cardTitle}
+                                onPress={() =>
+                                    navigation.navigate('DetalleEventoAdmin', {
+                                        idEvent: item.id,
+                                        evento: item,
+                                        token: token,
+                                    })
+                                }
+                            >
+                                {item.name}
+                            </Text>
+                            <Text style={styles.cardDate}>{item.start_date}</Text>
+                        </View>
+                    ))}
+                </View>
 
-            {/* Botón para añadir eventos */}
-            <TouchableOpacity
-                style={[styles.button, styles.createEventButton]}
-                onPress={() => navigation.navigate('Formulario', { token })}
-            >
-                <Text style={styles.buttonText}>Crear Evento</Text>
-            </TouchableOpacity>
+                {/* Botón para añadir eventos */}
+                <TouchableOpacity
+                    style={[styles.button, styles.createEventButton]}
+                    onPress={() => navigation.navigate('Formulario', { token })}
+                >
+                    <Text style={styles.buttonText}>Crear Evento</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </View>
     );
 }
@@ -99,11 +99,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F9FD',
         padding: 20,
     },
+    scrollContainer: {
+        paddingBottom: 20,
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#2C6B2F',  // Verde
-        marginBottom: 10,
+        marginVertical: 10,
         textAlign: 'center',
     },
     backButton: {
@@ -113,47 +116,43 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     cardContainer: {
-        display: 'flex',
-        flexDirection: 'row', // Para que las cards estén en fila
-        flexWrap: 'wrap',     // Permite que las cards se acomoden en varias filas
-        justifyContent: 'space-between', // Espaciado uniforme entre las tarjetas
-        gap: 20,              // Espacio entre las tarjetas
-        marginBottom: 30,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
     card: {
-        width: '48%',        // Dos tarjetas por fila
+        width: '48%',
         backgroundColor: '#fff',
         borderRadius: 10,
-        padding: 15,
-        marginBottom: 15,
+        padding: 10,
+        marginBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 3,
-        transition: 'transform 0.3s ease', // Efecto de hover
-        cursor: 'pointer',
+        elevation: 2,
     },
     cardTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: 'grey',
-        marginBottom: 10,
-        cursor: 'pointer',
+        marginBottom: 5,
     },
     cardDate: {
         fontSize: 14,
         color: '#666',
-        marginTop: 5,
     },
     button: {
-        paddingVertical: 14,
+        paddingVertical: 12,
         borderRadius: 8,
         alignItems: 'center',
-        marginVertical: 10,
+        marginVertical: 15,
+        alignSelf: 'center',
+        width: '60%',
     },
     createEventButton: {
-        backgroundColor: '#34A853', // Verde brillante para el botón
+        backgroundColor: '#34A853', // Color verde
     },
     buttonText: {
         color: 'white',

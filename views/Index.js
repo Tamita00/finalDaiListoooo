@@ -64,21 +64,23 @@ export default function Index() {
                 ))}
             </div>
 
-            <button 
-                style={{ ...styles.boton, ...styles.crearEvento }} 
-                onClick={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
-            >
-                Crear Evento
-            </button>
-
-            {id === 34 || id === 36 ? (
+            <div style={styles.buttonContainer}>
                 <button 
-                    style={{ ...styles.botonSecundario, ...styles.verTodos }} 
-                    onClick={() => navigation.navigate("Panel", { token: token })}
+                    style={{ ...styles.boton, ...styles.crearEvento }} 
+                    onClick={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
                 >
-                    Ver todos
+                    Crear Evento
                 </button>
-            ) : null}
+
+                {id === 34 || id === 36 ? (
+                    <button 
+                        style={{ ...styles.boton, ...styles.verTodos }} 
+                        onClick={() => navigation.navigate("Panel", { token: token })}
+                    >
+                        Ver todos
+                    </button>
+                ) : null}
+            </div>
         </div>
     );
 }
@@ -89,38 +91,36 @@ const styles = {
         flexDirection: 'column',
         backgroundColor: '#F8F9FD',
         padding: '20px',
+        justifyContent: 'center', // Centra los elementos verticalmente
+        alignItems: 'center', // Centra los elementos horizontalmente
+        minHeight: '100vh', // Hace que el contenedor ocupe toda la altura de la pantalla
     },
     title: {
-        fontSize: '24px',
+        fontSize: '32px',
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: '20px',
+        marginBottom: '30px',
         textAlign: 'center',
     },
     cardContainer: {
-        margin:"5% 5% 5%",
         display: 'flex',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         gap: '20px',
+        width: '80%',
     },
     eventContainer: {
-        width: '30%',
+        width: '45%',  // Ajustado para mostrar más contenedores en el centro
         padding: '20px',
         backgroundColor: '#fff',
         borderRadius: '10px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        transition: 'transform 0.3s ease',
         cursor: 'pointer',
-        color: "grey",
-    },
-    eventContainerHover: {
-        transform: 'scale(1.05)',
+        color: 'grey',
     },
     eventTitle: {
-        fontSize: '18px',
+        fontSize: '20px',
         fontWeight: 'bold',
-        cursor: 'pointer',
         color: '#007bff',
         marginBottom: '10px',
     },
@@ -129,36 +129,36 @@ const styles = {
         fontStyle: 'italic',
         color: '#888',
     },
+    buttonContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: '40px',
+    },
     boton: {
-        width: '80%',
-        padding: '14px',
+        width: '300px',
+        padding: '12px',
         borderRadius: '8px',
-        textAlign: 'center',
-        margin: '10px auto',
-        fontSize: '16px',
+        fontSize: '18px',
         fontWeight: 'bold',
         color: 'white',
-        cursor: 'pointer',
         border: 'none',
-        transition: 'all 0.3s ease', // Suaviza la transición de hover
+        cursor: 'pointer',
+        marginBottom: '10px',
+        transition: 'all 0.3s ease',
     },
     crearEvento: {
         backgroundColor: '#34A853',  // Verde brillante para Crear Evento
     },
     verTodos: {
-        background: 'linear-gradient(145deg, #6d7c96, #4a5468)', // Gradiente atractivo
+        background: 'linear-gradient(145deg, #6d7c96, #4a5468)', 
         color: 'white',
-        fontSize: '16px',
+        fontSize: '18px',
         fontWeight: 'bold',
         borderRadius: '8px',
-        padding: '12px 24px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra sutil para profundidad
-        border: 'none',
-        marginTop: '20px',
-        transition: 'transform 0.3s ease, background-color 0.3s ease', // Transición suave
-    },
-    verTodosHover: {
-        background: 'linear-gradient(145deg, #4a5468, #6d7c96)', // Cambiar gradiente en hover
-        transform: 'scale(1.05)', // Efecto de aumento de tamaño al hacer hover
+        padding: '12px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+        transition: 'transform 0.3s ease, background-color 0.3s ease',
     },
 };
