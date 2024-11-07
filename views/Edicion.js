@@ -154,9 +154,6 @@ export default function Edicion() {
                 <Text style={styles.buttonText}>Guardar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Panel', { token: token, id: idUser })}>
-                <Text style={styles.buttonSecondaryText}>Atrás</Text>
-            </TouchableOpacity>
         </View>
     );
 }
@@ -182,7 +179,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     input: {
-        width: '100%',
+        width: '40%',
         padding: 15,
         marginVertical: 8,
         borderWidth: 1,
@@ -191,17 +188,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     dropdownContainer: {
-        width: '100%',
+        width: '40%',
         paddingVertical: 10,
+        borderWidth: 1,
         paddingHorizontal: 20,
+        borderColor: '#ccc',
         backgroundColor: '#fff',
-        borderRadius: 20,
+        borderRadius: 10,
         marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-        elevation: 5,
     },
     item: {
         padding: 10,
@@ -231,7 +225,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     buttonSecondary: {
-        width: '100%',
+        width: '40%',
         padding: 15,
         backgroundColor: '#ccc',
         borderRadius: 10,
