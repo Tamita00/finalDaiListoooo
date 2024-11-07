@@ -1,11 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import CustomTextInput from '../components/textInput';
-import { StyleSheet, View } from 'react-native';
-import { loginUser, getAuth, getUserByUsername } from '../authService';
-import React, {useState} from 'react';
-import Title from '../components/Title';
-import Boton from '../components/Boton';
-import BotonSecundario from '../components/BotonSecundario';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { loginUser } from '../authService';
+import React, { useState } from 'react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -23,43 +19,65 @@ export default function Login() {
         "password" : contrasena 
       };
       const user = await loginUser(credentials);
-      // const userDetails = await getUserByUsername(`/users/username/${username}`);
-      // const userId = userDetails.id;
-      navigation.navigate('Index', { nombre: user.username, token: user.token});
+      navigation.navigate('Index', { nombre: user.username, token: user.token });
     } catch (error) {
       alert('Error al iniciar sesión');
       console.error('Error en el login:', error);
     }
   };
+
   return (
     <View style={styles.container}>
-        <Title text={"Inicio sesión"} />
-        <View style={styles.inputContainer}>
-            <CustomTextInput placeholder="Usuario" value={username} onChangeText={setUsername} style={styles.inputContainer} />
-            <CustomTextInput placeholder="Contraseña" value={contrasena} onChangeText={setContrasena} secureTextEntry style={styles.inputContainer} />
-            <Boton text="Iniciar Sesión" onPress={handleLogin} />
-            <p>No tienes cuenta?</p>
-            <BotonSecundario text ="Regístrate" onPress={() => navigation.navigate('Register')}/>
-        </View>
+      <Text style={styles.title}>Inicio sesión</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Usuario"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          value={contrasena}
+          onChangeText={setContrasena}
+          secureTextEntry
+        />
+        
+        <TouchableOpacity style={[styles.boton, styles.loginButton]} onPress={handleLogin}>
+          <Text style={styles.botonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.textFooter}>¿No tienes cuenta?</Text>
+        
+        <TouchableOpacity style={[styles.boton, styles.registerButton]} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.botonText}>Regístrate</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: '80%0',
     flex: 1,
     backgroundColor: '#F8F9FD',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     paddingTop: 50,
+    width: '100%',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2C6B2F',  // Verde
+    marginBottom: 30,
   },
   inputContainer: {
-    marginTop: 20,
+    width: '80%',
     alignItems: 'center',
-    width: '55%',
-    marginBottom: 20
   },
   input: {
     width: '100%',
@@ -74,4 +92,29 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  boton: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  loginButton: {
+    backgroundColor: '#34A853',  // Verde
+  },
+  registerButton: {
+    borderColor: '#34A853',  // Verde
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+  },
+  botonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  textFooter: {
+    fontSize: 14,
+    color: '#555',
+    marginVertical: 10,
+  }
 });

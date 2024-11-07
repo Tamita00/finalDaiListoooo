@@ -1,24 +1,22 @@
-// import { useState } from 'react';
-import {  useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
+import { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { postAuth } from './../authService';
 import React from 'react';
-import Title from '../components/Title';
-import Boton from '../components/Boton';
 
 export default function Confirmacion() {
     const navigation = useNavigation();
     const route = useRoute(); 
-    const { eventoACrear, token, categories, locations, nombre_user, idUser  } = route.params;
+    const { eventoACrear, token, categories, locations, nombre_user, idUser } = route.params;
     let selectedCategory, selectedLocation;
 
     selectedCategory = categories.find((category) => category.id === eventoACrear.id_event_category);
     selectedLocation = locations.find((location) => location.id === eventoACrear.id_event_location);
-    
+
     const guardarEvento = async () => {
         if(eventoACrear === null){
             console.error("Error al subir evento: ", error)
-        }else{
+        } else {
             postAuth('event/', eventoACrear, token)
             alert('Tu evento ha sido creado con éxito!')
             navigation.navigate("Index", { nombre: nombre_user, token: token })
@@ -39,16 +37,23 @@ export default function Confirmacion() {
     return (
         <View style={[styles.boxShadow, styles.container]}>
             
-            <Title text={"¿Querés publicar este evento?"}/>
+            <Text style={styles.title}>¿Querés publicar este evento?</Text>
+            
             <View style={styles.datosEvento}>
                 {Object.entries(eventoNuevo).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
-                        <Text style={styles.text}>{`${key}: ${value}`}</Text>
+                        {`${key}: ${value}`}
                     </Text>
                 ))}
             </View>
-            <Boton style={styles.no} text={'No'} onPress={()=> navigation.navigate("Index", { nombre: nombre_user, token: token })}/>
-            <Boton style={styles.si} text={'Si'} onPress={guardarEvento}/> 
+
+            <TouchableOpacity style={[styles.boton, styles.no]} onPress={() => navigation.navigate("Index", { nombre: nombre_user, token: token })}>
+                <Text style={styles.botonText}>No</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.boton, styles.si]} onPress={guardarEvento}>
+                <Text style={styles.botonText}>Sí</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -57,38 +62,54 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f0f0f0',  // Añadí un fondo neutro
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#2C6B2F',  // Color verde para el título
+        marginBottom: 20,
     },
     text: {
         fontSize: 16,
         marginVertical: 4,
         fontWeight: 'bold',
-        color: 'white'
+        color: 'black', // Color de texto ajustado a negro para mayor contraste
     },
     datosEvento: {
-        backgroundColor: 'rgb(0, 123, 255)',
-        borderRadius: '5%',
-        display: 'flex',
-        justifyContent: 'flex-start',
+        backgroundColor: '#34A853',  // Fondo verde
+        borderRadius: 8,
         padding: 25,
-        shadowOffset: '1%'
-    }, 
+        width: '100%',
+        marginBottom: 20,
+    },
     boxShadow: {
         shadowColor: "grey",
-        shadowOffset: {
-          width: 6,
-          height: 6,
-        },
+        shadowOffset: { width: 6, height: 6 },
         shadowOpacity: 0.5,
         shadowRadius: 4,
         elevation: 16,
-      },
-    no:{
-        borderColor: '#007BFF',
-        backgroundColor: 'transparent'
     },
-    si:{
-        backgroundColor:  '#007BFF'
+    boton: {
+        width: '80%',
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    no: {
+        borderColor: '#34A853',
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+    },
+    si: {
+        backgroundColor: '#34A853',
+    },
+    botonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     }
 });
-
