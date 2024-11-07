@@ -2,6 +2,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { postAuth, getCategories, getLocations } from '../authService';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
 
 export default function DetalleEvento() {
     const route = useRoute();
@@ -19,7 +20,10 @@ export default function DetalleEvento() {
             navigation.navigate('Index', { token, idUser });
         } catch (error) {
             console.error('Error al inscribirse:', error);
-            Alert.alert('Error', 'No se pudo completar la inscripción');
+            // Aquí asumimos que la API devuelve un error con un mensaje específico si no hay más cupos
+            if (error) {
+                Alert.alert('Error', 'Lo sentimos, no hay más cupos disponibles para este evento o ya te inscribiste');
+            } 
         }
     };
 
@@ -68,6 +72,14 @@ export default function DetalleEvento() {
 
     return (
         <View style={styles.container}>
+            {/* Botón de flecha para volver */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()} // Navega hacia atrás
+            >
+                <Ionicons name="arrow-back" size={30} color="#333" />
+            </TouchableOpacity>
+            {/* Detalles del evento */}
             <View style={styles.datosEvento}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -75,13 +87,8 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
+            {/* Botones de Acción */}
             <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={[styles.button, styles.secondaryButton]} 
-                    onPress={() => navigation.navigate('Index', { token, idUser })}
-                >
-                    <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.button} 
                     onPress={enroll}
@@ -100,6 +107,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        padding: 10,
+        zIndex: 10, // Asegura que el botón quede sobre otros elementos
     },
     datosEvento: {
         width: '100%',

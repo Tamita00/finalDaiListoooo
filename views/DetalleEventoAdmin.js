@@ -90,22 +90,16 @@ export default function DetalleEventoAdmin() {
             </View>
 
             <View style={styles.containerBotones}>
-                <TouchableOpacity
-                    style={[styles.button, styles.buttonSecondary]}
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
-                >
-                    <Text style={styles.buttonText}>Atrás</Text>
-                </TouchableOpacity>
                 {fechaInicioEvento > fechaActual && (
                     <>
                         <TouchableOpacity
-                            style={styles.button}
+                            style={[styles.button, styles.buttonEdit]}
                             onPress={() => navigation.navigate('Edicion', { idEvent, token, id: idUser, eventoAEditar: evento })}
                         >
                             <Text style={styles.buttonText}>Editar</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.button}
+                            style={[styles.button, styles.buttonDelete]}
                             onPress={eliminarEvento}
                         >
                             <Text style={styles.buttonText}>Eliminar</Text>
@@ -179,19 +173,22 @@ const styles = StyleSheet.create({
         maxHeight: '50%',
     },
     button: {
-        backgroundColor: '#4CAF50',
-        padding: 15,
-        borderRadius: 10,
+        paddingVertical: 10, // Reducido el padding para hacer los botones más pequeños
+        paddingHorizontal: 15, // Reducido el padding horizontal
+        borderRadius: 8, // Redondear un poco más
         alignItems: 'center',
-        marginTop: 10,
-        width: '45%',
+        width: '45%', // Reducido el tamaño de los botones
+        marginVertical: 5, // Espaciado vertical para que no se vean tan apelmazados
     },
-    buttonSecondary: {
-        backgroundColor: '#ccc',
+    buttonEdit: {
+        backgroundColor: '#4CAF50', // Fondo verde para el botón de "Editar"
+    },
+    buttonDelete: {
+        backgroundColor: '#D32F2F', // Fondo rojo para el botón de "Eliminar"
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 14, // Tamaño de texto un poco más pequeño para botones más pequeños
         fontWeight: 'bold',
     },
 });
