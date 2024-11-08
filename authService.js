@@ -1,4 +1,5 @@
 import { api } from './api';
+import axios from 'axios';
 
 //credenciales + post
 export const postAuth = async (endpoint, body, token) => {
@@ -29,16 +30,21 @@ export const post = async (endpoint) => {
 };
 
 //put
-export const putEvento = async (endpoint) => {
-    try {
-      const response = await api.put('/eventos', endpoint); // Asegúrate de pasar el endpoint correcto
-      return response.data;
+export const putEvento = async (endpoint, event, credentials) => {
+  console.log(endpoint);
+  
+  
+  try {
+    console.log("entro")
+    const response = await api.put(endpoint, event, {headers: {
+      'Authorization': `Bearer ${credentials}`}
+    })
+    return response.data;
   } catch (error) {
       console.error('Error al hacer PUT:', error);
       throw error;
   }
 };
-
 
 //get credenciales
 export const getAuth = async(endpoint, credentials) => {

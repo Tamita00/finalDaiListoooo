@@ -18,10 +18,11 @@ export default function Confirmacion() {
             if (!eventoAEditar) {
                 throw new Error("Evento no válido");
             }
-            await putEvento('event/', eventoAEditar, token);
+            await putEvento('/event/', eventoAEditar, token);
+            
             //await postAuth('event/', eventoAEditar, token);
             Alert.alert('Éxito', 'Tu evento ha sido creado con éxito!');
-            navigation.navigate("Index", { nombre: nombre_user, token });
+            // navigation.navigate("Index", { nombre: nombre, token });
         } catch (error) {
             console.error("Error al subir evento:", error);
             Alert.alert('Error', 'Hubo un problema al crear el evento');
