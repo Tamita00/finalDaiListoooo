@@ -3,11 +3,12 @@ import axios from 'axios';
 
 //credenciales + post
 export const postAuth = async (endpoint, body, token) => {
+  console.log(endpoint);
   try {
     const response = await api.post(endpoint, body, {
-      /*headers: {
+      headers: {
         Authorization: `Bearer ${token}`
-      }*/
+      }
     });
     return response.data;
   } catch (error) {
@@ -31,11 +32,10 @@ export const post = async (endpoint) => {
 
 //put
 export const putEvento = async (endpoint, event, credentials) => {
-  console.log(endpoint);
+  console.log(event);
   
   
   try {
-    console.log("entro")
     const response = await api.put(endpoint, event, {headers: {
       'Authorization': `Bearer ${credentials}`}
     })

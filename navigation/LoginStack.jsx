@@ -9,6 +9,7 @@ import DetalleEvento from '../views/DetalleEvento'
 import Panel from '../views/Panel'
 import DetalleEventoAdmin from '../views/DetalleEventoAdmin';
 import Edicion from '../views/Edicion'
+import ConfirmacionEdicion from '../views/ConfirmacionEdicion';
 
 const LoginNavigation = () => {
     const LoginStack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ const LoginNavigation = () => {
         <LoginStack.Screen name="Index" component={Index}/>
         <LoginStack.Screen name="Formulario" component={Formulario}/>
         <LoginStack.Screen name="Confirmacion" component={Confirmacion}/>
+        <LoginStack.Screen name="ConfirmacionEdicion" component={ConfirmacionEdicion}/>
         <LoginStack.Screen name="DetalleEvento" component={DetalleEvento}/>
         <LoginStack.Screen name="DetalleEventoAdmin" component={DetalleEventoAdmin}/>
         <LoginStack.Screen name="Panel" component={Panel}/>

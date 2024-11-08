@@ -70,7 +70,7 @@ export default function Edicion() {
             "id_creator_user": idUser
         };
         console.log("llego a handleGuardar");
-        navigation.navigate('Confirmacion', { eventoAEditar, token, categories, locations, nombre, idUser });
+        navigation.navigate('ConfirmacionEdicion', { eventoAEditar, token, categories, locations, nombre, idUser });
     };
 
     const handleDateChange = (newDate) => {

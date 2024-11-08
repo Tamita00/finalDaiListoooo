@@ -1,15 +1,15 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import React from 'react';
-import { postAuth } from './../authService';
+import { putEvento } from '../authService';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
 
-export default function Confirmacion() {
+export default function ConfirmacionEdicion() {
     const navigation = useNavigation();
     const route = useRoute(); 
     const { eventoAEditar, token, categories, locations, nombre, idUser } = route.params;
 
-    const selectedCategory = categories.find((category) => category.id_event_category === eventoAEditar.id_event_category);
+    const selectedCategory = categories.find((category) => category.id === eventoAEditar.id);
     console.log(eventoAEditar, token, categories, locations, nombre, idUser);
     const selectedLocation = locations.find((location) => location.id === eventoAEditar.id_event_location);
     
@@ -18,10 +18,11 @@ export default function Confirmacion() {
             if (!eventoAEditar) {
                 throw new Error("Evento no válido");
             }
+            await putEvento('/event/', eventoAEditar, token);
             
-            await postAuth('event/', eventoAEditar, token);
+            //await postAuth('event/', eventoAEditar, token);
             Alert.alert('Éxito', 'Tu evento ha sido creado con éxito!');
-            navigation.navigate("Index", { nombre: nombre, token });
+            // navigation.navigate("Index", { nombre: nombre, token });
         } catch (error) {
             console.error("Error al subir evento:", error);
             Alert.alert('Error', 'Hubo un problema al crear el evento');
