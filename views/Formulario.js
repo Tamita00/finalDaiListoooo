@@ -70,6 +70,13 @@ export default function Formulario() {
         }
     };
 
+    const formatDate = (date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     return (
         <View style={styles.container}>
             {/* Flecha para regresar */}
@@ -120,31 +127,16 @@ export default function Formulario() {
                 keyboardType="numeric"
             />
 
-            {/* Selector de fecha con icono de calendario */}
-            <View style={styles.datePickerContainer}>
+            {/* Selector de fecha con DateTimePicker */}
+            <TouchableOpacity style={styles.datePickerContainer} onPress={() => setShowDatePicker(true)}>
                 <TextInput
                     style={styles.dateInput}
-                    placeholder="dd/mm/yyyy"  // Placeholder con el formato
-                    value={eventDate.toLocaleDateString('es-ES')}  // Mostrar la fecha en formato dd/mm/yyyy
-                    textAlign="center"
-                    editable={true}  // Permitir la edición manual
-                    onChangeText={(text) => {
-                        // Validar la entrada y actualizar la fecha
-                        const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-                        const match = text.match(regex);
-                        if (match) {
-                            const [ , day, month, year ] = match;
-                            const newDate = new Date(year, month - 1, day);
-                            if (newDate.getDate() === parseInt(day) && newDate.getMonth() === parseInt(month) - 1 && newDate.getFullYear() === parseInt(year)) {
-                                setEventDate(newDate);
-                            }
-                        }
-                    }}
+                    value={formatDate(eventDate)} // Formatear la fecha para mostrarla
+                    editable={false}
+                    placeholder="Fecha del evento"
                 />
-                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                    <Ionicons name="calendar" size={24} color="#757575" />
-                </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
+            
             {showDatePicker && (
                 <DateTimePicker
                     value={eventDate}
