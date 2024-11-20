@@ -1,14 +1,17 @@
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import BotonSecundario from '../components/BotonSecundario';
+import Boton from '../components/Boton';
+import Title from '../components/Title';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { get, deleteAuth } from '../authService';
 
 export default function DetalleEventoAdmin() {
     const navigation = useNavigation();
+    const saludo = "Detalle del evento";
     const route = useRoute();
-    const { idEvent, token, idUser, nombre, evento } = route.params;
-    
+    const { idEvent, token, idUser, evento, nombre_user } = route.params;
     const [inscriptos, setInscriptos] = useState([]);
 
     const fetchInscriptos = async () => {
@@ -21,25 +24,19 @@ export default function DetalleEventoAdmin() {
     };
 
     const eliminarEvento = async () => {
-        Alert.alert(
-            "Confirmación",
-            "¿Querés eliminar el evento?",
-            [
-                { text: "Cancelar", style: "cancel" },
-                {
-                    text: "Eliminar", onPress: async () => {
-                        try {
-                            await deleteAuth(`event/${evento.id}`, token);
-                            Alert.alert("Evento eliminado con éxito.");
-                        } catch (error) {
-                            console.error("Error al eliminar el evento:", error);
-                            Alert.alert("Hubo un problema al eliminar el evento.");
-                        }
-                    }
-                }
-            ]
-        );
+        const confirmacion = window.confirm("¿Querés eliminar el evento?");
+    
+        if (confirmacion) {
+            try {
+                await deleteAuth(`event/${evento.id}`, token);
+                alert("Evento eliminado con éxito.");
+            } catch (error) {
+                console.error("Error al eliminar el evento:", error);
+                alert("Hubo un problema al eliminar el evento.");
+            }
+        }
     };
+    
 
     useEffect(() => {
         fetchInscriptos();
@@ -48,8 +45,8 @@ export default function DetalleEventoAdmin() {
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida',
-        'Localidad': evento.id_event_location || 'Desconocida',
+        'Categoria': evento.id_event_category || 'Desconocida', // se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
+        'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -60,13 +57,7 @@ export default function DetalleEventoAdmin() {
 
     return (
         <View style={styles.container}>
-            {/* Flecha para regresar */}
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Index', { token, id: idUser })}>
-                <Ionicons name="arrow-back" size={30} color="#757575" />
-            </TouchableOpacity>
-
-            <Text style={styles.title}>Detalle del evento</Text>
-
+            <Title text={saludo} />
             <View style={[styles.card, styles.cardData]}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -74,9 +65,8 @@ export default function DetalleEventoAdmin() {
                     </Text>
                 ))}
             </View>
-
             <View style={styles.card}>
-                <Text style={styles.tituloCard}>Inscriptos</Text>
+                <h2 style={styles.tituloCard}>Inscriptos</h2>
                 <FlatList
                     data={inscriptos}
                     keyExtractor={(item) => item.id.toString()}
@@ -89,24 +79,23 @@ export default function DetalleEventoAdmin() {
                     style={styles.flatList}
                 />
             </View>
-
             <View style={styles.containerBotones}>
-                {fechaInicioEvento > fechaActual && (
+                <BotonSecundario 
+                    text={'Atrás'} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
+                />
+                {fechaInicioEvento > fechaActual ? (
                     <>
-                        <TouchableOpacity
-                            style={[styles.button, styles.buttonEdit]}
-                            onPress={() => navigation.navigate('Edicion', { idEvent, token, idUser: idUser, nombre: nombre, evento: evento })}
-                        >
-                            <Text style={styles.buttonText}>Editar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.buttonDelete]}
+                        <Boton 
+                            text={'Editar'} 
+                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, idUser: idUser, eventoAEditar: evento, nombre_user: nombre_user })} 
+                        />
+                        <Boton
+                            text={'Eliminar'}
                             onPress={eliminarEvento}
-                        >
-                            <Text style={styles.buttonText}>Eliminar</Text>
-                        </TouchableOpacity>
+                        />
                     </>
-                )}
+                ) : null}
             </View>
         </View>
     );
@@ -120,24 +109,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 10,
-        zIndex: 10,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-    },
     containerBotones: {
         flexDirection: 'row',
-        width: '100%',
+        width: '10%',
         maxWidth: 600,
         marginTop: 20,
-        justifyContent: 'space-around',
+        left: -120
     },
     card: {
         width: '100%',
@@ -158,9 +135,8 @@ const styles = StyleSheet.create({
     tituloCard: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 30,
         color: 'rgb(16, 137, 211)',
-        marginBottom: 10,
     },
     text: {
         fontSize: 16,
@@ -173,23 +149,5 @@ const styles = StyleSheet.create({
     flatList: {
         maxHeight: '50%',
     },
-    button: {
-        paddingVertical: 10, // Reducido el padding para hacer los botones más pequeños
-        paddingHorizontal: 15, // Reducido el padding horizontal
-        borderRadius: 8, // Redondear un poco más
-        alignItems: 'center',
-        width: '45%', // Reducido el tamaño de los botones
-        marginVertical: 5, // Espaciado vertical para que no se vean tan apelmazados
-    },
-    buttonEdit: {
-        backgroundColor: '#4CAF50', // Fondo verde para el botón de "Editar"
-    },
-    buttonDelete: {
-        backgroundColor: '#D32F2F', // Fondo rojo para el botón de "Eliminar"
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 14, // Tamaño de texto un poco más pequeño para botones más pequeños
-        fontWeight: 'bold',
-    },
 });
+

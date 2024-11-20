@@ -1,9 +1,7 @@
 import { api } from './api';
-import axios from 'axios';
 
 //credenciales + post
 export const postAuth = async (endpoint, body, token) => {
-  console.log(endpoint);
   try {
     const response = await api.post(endpoint, body, {
       headers: {
@@ -29,23 +27,6 @@ export const post = async (endpoint) => {
     throw error;
   }
 };
-
-//put
-export const putEvento = async (endpoint, event, credentials) => {
-  console.log(event);
-  
-  
-  try {
-    const response = await api.put(endpoint, event, {headers: {
-      'Authorization': `Bearer ${credentials}`}
-    })
-    return response.data;
-  } catch (error) {
-      console.error('Error al hacer PUT:', error);
-      throw error;
-  }
-};
-
 //get credenciales
 export const getAuth = async(endpoint, credentials) => {
   try {
@@ -59,6 +40,24 @@ export const getAuth = async(endpoint, credentials) => {
     throw error;
   }
 }
+
+//Update
+export const putAuth = async (endpoint, credentials, body) => {
+  try {
+    const response = await api.put(endpoint, body, {
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Endpoint:', endpoint);
+    console.error('Error en el put:', error);
+    throw error;
+  }
+};
+
 
 export const deleteAuth = async(endpoint, credentials) => {
   try{

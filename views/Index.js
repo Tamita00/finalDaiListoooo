@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
+import Boton from '../components/Boton';
+import BotonSecundario from '../components/BotonSecundario';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getEventos, getAuth, get } from '../authService';
 
@@ -21,9 +24,10 @@ export default function Index() {
     }
 
     const canAddAttendant = async (event) => {
+    {
         const enlistados = await get('event/enrollment/' + event.id.toString());
         return enlistados.length < event.maxAssistant;
-    }
+    }}
 
     const fetchEventos = async () => {
         try {
@@ -36,128 +40,75 @@ export default function Index() {
 
     useEffect(() => {
         const fetchData = async () => {
+            setEventos([]);  // Limpiar eventos antes de hacer el fetch
             const userId = await getId();
             setId(userId);
             await fetchEventos();
         };
         fetchData();
     }, []);
+    
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Próximos Eventos</h1>
-
-            <div style={styles.cardContainer}>
-                {eventos.filter(isDateFuture).map(item => (
-                    <div style={styles.eventContainer} key={item.id}>
-                        <h2 
-                            style={styles.eventTitle} 
-                            onClick={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}
-                        >
-                            {item.name}
-                        </h2>
+        <View style={styles.container}>
+            <Text style={styles.title}>Próximos Eventos</Text>
+            <FlatList
+                data={eventos.filter(isDateFuture)}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.eventContainer}>
+                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEvento', { token: token, idUser: id, idEvent: item.id, evento: item })}>{item.name}</Text>
+                        {/* <Text style={styles.eventTitle} onPress={() => console.log('a ver este item.id: ', item.id)}> {item.name} </Text> */}
+                        <Text>{item.start_date}</Text>
                         {canAddAttendant(item)
-                            ? <p style={styles.attendantText}>Únete</p>
-                            : <p style={styles.attendantText}>No hay más entradas</p>}
-                    </div>
-                ))}
-            </div>
+                            ? <Text style={styles.attendantText}>Podes unirte</Text>
+                            : <Text style={styles.attendantText}>Entradas agotadas</Text>}
+                    </View>
+                )}
+                contentContainerStyle={styles.listContainer}
 
-            <div style={styles.buttonContainer}>
-                <button 
-                    style={{ ...styles.boton, ...styles.crearEvento }} 
-                    onClick={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })}
-                >
-                    Crear Evento
-                </button>
+            />
+            <Boton text={"Crear nuevo evento"} onPress={() => navigation.navigate('Formulario', { token: token, idUser: id, nombre_user: nombre })} />
+            {id === 92 || id === 50 ? (
+            <BotonSecundario text="Ver todos los eventos" onPress={() => navigation.navigate("Panel", { token: token, nombre_user: nombre, idUser: id })} />
+            ) : null}
 
-                {id === 34 || id === 36 ? (
-                    <button 
-                        style={{ ...styles.boton, ...styles.verTodos }} 
-                        onClick={() => navigation.navigate("Panel", {token: token, idUser: id, nombre_user: nombre })}
-                    >
-                        Ver todos
-                    </button>
-                ) : null}
-            </div>
-        </div>
+        </View>
     );
 }
 
-const styles = {
+
+const styles = StyleSheet.create({
     container: {
-        display: 'flex',
-        flexDirection: 'column',
+        flex: 1,
         backgroundColor: '#F8F9FD',
-        padding: '20px',
-        justifyContent: 'center', // Centra los elementos verticalmente
-        alignItems: 'center', // Centra los elementos horizontalmente
-        minHeight: '100vh', // Hace que el contenedor ocupe toda la altura de la pantalla
+        padding: 20,
     },
     title: {
-        fontSize: '32px',
+        fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: '30px',
+        marginBottom: 10,
         textAlign: 'center',
     },
-    cardContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: '20px',
-        width: '80%',
+    subtitle: {
+        fontSize: 16,
+        color: '#555',
+        marginBottom: 30,
+        textAlign: 'center',
+    },
+    listContainer: {
+        paddingBottom: 20,
     },
     eventContainer: {
-        width: '45%',  // Ajustado para mostrar más contenedores en el centro
-        padding: '20px',
+        padding: 15,
         backgroundColor: '#fff',
-        borderRadius: '10px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
-        color: 'grey',
+        borderRadius: 5,
+        marginBottom: 10,
+        elevation: 1,
     },
     eventTitle: {
-        fontSize: '20px',
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#007bff',
-        marginBottom: '10px',
     },
-    attendantText: {
-        fontSize: '14px',
-        fontStyle: 'italic',
-        color: '#888',
-    },
-    buttonContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%',
-        marginTop: '40px',
-    },
-    boton: {
-        width: '300px',
-        padding: '12px',
-        borderRadius: '8px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        marginBottom: '10px',
-        transition: 'all 0.3s ease',
-    },
-    crearEvento: {
-        backgroundColor: '#34A853',  // Verde brillante para Crear Evento
-    },
-    verTodos: {
-        background: 'linear-gradient(145deg, #6d7c96, #4a5468)', 
-        color: 'white',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        borderRadius: '8px',
-        padding: '12px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-        transition: 'transform 0.3s ease, background-color 0.3s ease',
-    },
-};
+});

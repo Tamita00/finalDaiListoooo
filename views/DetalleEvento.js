@@ -1,32 +1,26 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import Boton from '../components/Boton';
 import React, { useState, useEffect } from 'react';
-import { postAuth, getCategories, getLocations } from '../authService';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
+import BotonSecundario from '../components/BotonSecundario';
+import { postAuth } from '../authService';
+import { getCategories, getLocations, getAuth } from '../authService';
 
 export default function DetalleEvento() {
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
     const navigation = useNavigation();
 
-    const [categories, setCategories] = useState([]);
-    const [locations, setLocations] = useState([]);
+    const [categories, setCategories ] = useState([]);
+    const [locations, setLocations]  = useState([]);
 
     const enroll = async () => {
-        try {
-            const endpoint = `event/${idEvent}/enrollment`;
-            await postAuth(endpoint, evento, token);
-            Alert.alert('Éxito', 'Te registraste exitosamente! :D');
-            navigation.navigate('Index', { token, idUser });
-        } catch (error) {
-            console.error('Error al inscribirse:', error);
-            // Aquí asumimos que la API devuelve un error con un mensaje específico si no hay más cupos
-            if (error) {
-                Alert.alert('Error', 'Lo sentimos, no hay más cupos disponibles para este evento o ya te inscribiste');
-            } 
-        }
-    };
-
+        const endpoint = 'event/' + idEvent + '/enrollment';
+        const enrollment = await postAuth(endpoint, evento, token);
+        console.log('enrollment.data', enrollment.data);
+        alert('Te registraste exitosamente! :D')
+        navigation.navigate('Index', { token: token, idUser: idUser});
+    }
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -50,21 +44,15 @@ export default function DetalleEvento() {
         fetchLocations();
     }, [token]);
 
-    const getCategoryName = (categoryId) => {
-        const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'Desconocida';
-    };
-
-    const getLocationName = (locationId) => {
-        const location = locations.find(loc => loc.id === locationId);
-        return location ? location.name : 'Desconocida';
-    };
+    console.log('id_event_category', evento.id_event_category);
+    console.log('categorías', categories); 
+    console.log('categorías sub id-event-category', categories[evento.id_event_category]); 
 
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': getCategoryName(evento.id_event_category),
-        'Localidad': getLocationName(evento.id_event_location),
+        'Categoria': evento.id_event_category || 'Desconocida', //se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
+        'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -72,14 +60,6 @@ export default function DetalleEvento() {
 
     return (
         <View style={styles.container}>
-            {/* Botón de flecha para volver */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()} // Navega hacia atrás
-            >
-                <Ionicons name="arrow-back" size={30} color="#333" />
-            </TouchableOpacity>
-            {/* Detalles del evento */}
             <View style={styles.datosEvento}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -87,14 +67,15 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
-            {/* Botones de Acción */}
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={styles.button} 
-                    onPress={enroll}
-                >
-                    <Text style={styles.buttonText}>Inscribirse</Text>
-                </TouchableOpacity>
+            <View>
+                <BotonSecundario 
+                    text={'Atrás'} 
+                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
+                />
+                <Boton 
+                    text={'Inscribirse'} 
+                    onPress={enroll} 
+                /> 
             </View>
         </View>
     );
@@ -108,19 +89,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 20,
-        padding: 10,
-        zIndex: 10, // Asegura que el botón quede sobre otros elementos
-    },
     datosEvento: {
         width: '100%',
-        maxWidth: 600,
-        padding: 20,
+        maxWidth: 600, 
+        padding: 15,
         backgroundColor: '#ffffff',
-        borderRadius: 12,
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -133,27 +107,4 @@ const styles = StyleSheet.create({
         color: '#333',
         marginVertical: 5,
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        maxWidth: 600,
-        marginTop: 20,
-    },
-    button: {
-        backgroundColor: '#4CAF50',
-        padding: 15,
-        borderRadius: 12,
-        alignItems: 'center',
-        flex: 1,
-        marginHorizontal: 10,
-    },
-    secondaryButton: {
-        backgroundColor: '#ccc',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});
+})

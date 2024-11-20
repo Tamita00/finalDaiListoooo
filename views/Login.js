@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Importar Ionicons
-
-import { loginUser } from '../authService';
+import CustomTextInput from '../components/textInput';
+import { StyleSheet, View } from 'react-native';
+import { loginUser, getAuth, getUserByUsername } from '../authService';
+import React, {useState} from 'react';
+import Title from '../components/Title';
+import Boton from '../components/Boton';
+import BotonSecundario from '../components/BotonSecundario';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -21,76 +23,46 @@ export default function Login() {
         "password" : contrasena 
       };
       const user = await loginUser(credentials);
-      navigation.navigate('Index', { nombre: user.username, token: user.token });
+      // const userDetails = await getUserByUsername(`/users/username/${username}`);
+      // const userId = userDetails.id;
+      navigation.navigate('Index', { nombre: user.username, token: user.token});
     } catch (error) {
       alert('Error al iniciar sesión');
       console.error('Error en el login:', error);
     }
   };
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()} // Navega hacia atrás
-      >
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
-      <Text style={styles.title}>Inicio sesión</Text>
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Usuario"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          value={contrasena}
-          onChangeText={setContrasena}
-          secureTextEntry
-        />
-        
-        <TouchableOpacity style={[styles.boton, styles.loginButton]} onPress={handleLogin}>
-          <Text style={styles.botonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-
-      </View>
+        <Title text={"Inicio sesión"} />
+        <View style={styles.inputContainer}>
+            <CustomTextInput placeholder="Usuario" value={username} onChangeText={setUsername} style={styles.inputContainer} />
+            <CustomTextInput placeholder="Contraseña" value={contrasena} onChangeText={setContrasena} secureTextEntry style={styles.inputContainer} />
+            <Boton text="Iniciar Sesión" onPress={handleLogin} />
+            <p>No tienes cuenta?</p>
+            <BotonSecundario text ="Regístrate" onPress={() => navigation.navigate('Register')}/>
+        </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    width: '80%0',
     flex: 1,
     backgroundColor: '#F8F9FD',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     paddingTop: 50,
-    width: '100%',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2C6B2F',  // Verde
-    marginBottom: 30,
   },
   inputContainer: {
-    width: '80%',
+    marginTop: 20,
     alignItems: 'center',
+    width: '55%',
+    marginBottom: 20
   },
   input: {
-    width: '40%',
+    width: '100%',
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
@@ -102,24 +74,4 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  boton: {
-    width: '40%',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  loginButton: {
-    backgroundColor: '#34A853',  // Verde
-  },
-  botonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  textFooter: {
-    fontSize: 14,
-    color: '#555',
-    marginVertical: 10,
-  }
 });
