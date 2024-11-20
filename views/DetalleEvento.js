@@ -1,26 +1,26 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import BotonSecundario from '../components/BotonSecundario';
 import { postAuth } from '../authService';
-import { getCategories, getLocations, getAuth } from '../authService';
+import { getCategories, getLocations } from '../authService';
+import { Ionicons } from '@expo/vector-icons'; // Para usar el ícono de la flecha
 
 export default function DetalleEvento() {
     const route = useRoute();
     const { idEvent, token, idUser, evento } = route.params;
     const navigation = useNavigation();
 
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
 
     const enroll = async () => {
         const endpoint = 'event/' + idEvent + '/enrollment';
         const enrollment = await postAuth(endpoint, evento, token);
         console.log('enrollment.data', enrollment.data);
-        alert('Te registraste exitosamente! :D')
-        navigation.navigate('Index', { token: token, idUser: idUser});
+        alert('Te registraste exitosamente! :D');
+        navigation.navigate('Index', { token: token, idUser: idUser });
     }
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -44,15 +44,11 @@ export default function DetalleEvento() {
         fetchLocations();
     }, [token]);
 
-    console.log('id_event_category', evento.id_event_category);
-    console.log('categorías', categories); 
-    console.log('categorías sub id-event-category', categories[evento.id_event_category]); 
-
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida', //se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
-        'Localidad': evento.id_event_location || 'Desconocida', 
+        'Categoria': categories[evento.id_event_category] ? categories[evento.id_event_category].name : 'Desconocida',
+        'Localidad': locations[evento.id_event_location] ? locations[evento.id_event_location].name : 'Desconocida',
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
         'Precio': `$${evento.price}`
@@ -60,6 +56,12 @@ export default function DetalleEvento() {
 
     return (
         <View style={styles.container}>
+            {/* Flecha para regresar atrás */}
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back-circle" size={40} color="black" />
+            </TouchableOpacity>
+            
+            {/* Datos del evento */}
             <View style={styles.datosEvento}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -67,15 +69,13 @@ export default function DetalleEvento() {
                     </Text>
                 ))}
             </View>
-            <View>
-                <BotonSecundario 
-                    text={'Atrás'} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
-                />
-                <Boton 
-                    text={'Inscribirse'} 
-                    onPress={enroll} 
-                /> 
+
+            {/* Botones de acción */}
+            <View style={styles.buttonsContainer}>
+                {/* Botón "Inscribirse" */}
+                <TouchableOpacity style={styles.enrollButtonStyle} onPress={enroll}>
+                    <Text style={styles.buttonText}>Inscribirse</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -88,6 +88,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        zIndex: 1,
     },
     datosEvento: {
         width: '100%',
@@ -107,4 +113,22 @@ const styles = StyleSheet.create({
         color: '#333',
         marginVertical: 5,
     },
-})
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    enrollButtonStyle: {
+        flex: 1,
+        backgroundColor: 'green', // Botón verde para inscribirse
+        paddingVertical: 12,
+        marginLeft: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'white',
+    }
+});

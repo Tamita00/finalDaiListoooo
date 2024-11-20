@@ -1,41 +1,25 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text } from 'react-native';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import CustomTextInput from '../components/textInput';
-import NumberInput from '../components/numberInput';
-import { Dropdown } from 'react-native-element-dropdown';
+import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
 import { getCategories, getLocations, postAuth } from '../authService';
-import DateInput from '../components/dateInput';
-import BotonSecundario from '../components/BotonSecundario';
 
 export default function Formulario() {
     const navigation = useNavigation();
-    
-    const [ nombre, setNombre ] = useState("");
-    const [ descripcion, setDescripcion ] = useState("");
-    const [ duracion, setDuracion ] = useState("");
-    const [ precio, setPrecio ] = useState("");
-    const [ asistenciaMax, setAsistenciaMax ] = useState("");
-    // const [showDatePicker, setShowDatePicker] = useState(false);
-    const [ eventDate, setEventDate] = useState("");
-    
-    const [categories, setCategories ] = useState([]);
-    const [locations, setLocations]  = useState([]);
-    const [idSelectedCategory, idSetSelectedCategory] = useState(null);
-    const [idSelectedLocation, setIdSelectedLocation] = useState(null);
-    
     const route = useRoute();
-    const { token, idUser, nombre_user } = route.params;  
-    console.log(idUser);
+    const { token, idUser, nombre_user } = route.params;
 
-    const renderItem = (item) => (
-        <View style={styles.item}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemDate}>{item.start_date}</Text>
-        </View>
-    );
+    const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [duracion, setDuracion] = useState("");
+    const [precio, setPrecio] = useState("");
+    const [asistenciaMax, setAsistenciaMax] = useState("");
+    const [eventDate, setEventDate] = useState("");
+
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [idSelectedCategory, setIdSelectedCategory] = useState(null);
+    const [idSelectedLocation, setIdSelectedLocation] = useState(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -46,7 +30,7 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
             }
         };
-    
+
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
@@ -55,12 +39,12 @@ export default function Formulario() {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
             }
         };
-    
+
         fetchCategories();
         fetchLocations();
     }, [token]);
 
-    function handleGuardar(){
+    function handleGuardar() {
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
@@ -69,51 +53,93 @@ export default function Formulario() {
             'start_date': eventDate,
             'duration_in_minutes': duracion,
             'price': precio,
-            "enabled_for_enrollment": 1,
+            'enabled_for_enrollment': 1,
             'max_assistance': asistenciaMax,
-            "id_creator_user": idUser
-        }
-        navigation.navigate('Confirmacion', {eventoACrear: eventoACrear, token: token, categories: categories, locations: locations, nombre_user: nombre_user, idUser: idUser});
+            'id_creator_user': idUser,
+        };
+        navigation.navigate('Confirmacion', {
+            eventoACrear: eventoACrear,
+            token: token,
+            categories: categories,
+            locations: locations,
+            nombre_user: nombre_user,
+            idUser: idUser,
+        });
         console.log(eventoACrear);
     }
 
     return (
         <View style={styles.container}>
-            <Title text="Crear un nuevo evento" />
-            <CustomTextInput placeholder="Nombre" value={nombre} onChangeText={setNombre}/>
-            <CustomTextInput placeholder="Descripción" value={descripcion} onChangeText={setDescripcion}/>
-            <NumberInput placeholder="Duración en minutos" value={duracion} onChange={setDuracion}/>
-            <NumberInput placeholder="Precio" value={precio} onChange={setPrecio}/>
-            <NumberInput placeholder="Asistencia máxima" value={asistenciaMax} onChange={setAsistenciaMax}/>
-            <DateInput date={eventDate} setFecha={setEventDate}/>
+            {/* Flecha para regresar */}
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back-circle" size={40} color="black" />
+            </TouchableOpacity>
+
+            {/* Título */}
+            <Text style={styles.title}>Crear un nuevo evento</Text>
+
+            {/* Campos del formulario */}
+            <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                value={nombre}
+                onChangeText={setNombre}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={descripcion}
+                onChangeText={setDescripcion}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Duración en minutos"
+                value={duracion}
+                onChangeText={setDuracion}
+                keyboardType="numeric"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Precio"
+                value={precio}
+                onChangeText={setPrecio}
+                keyboardType="numeric"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Asistencia máxima"
+                value={asistenciaMax}
+                onChangeText={setAsistenciaMax}
+                keyboardType="numeric"
+            />
+
+            {/* Dropdown para categorías */}
             <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={categories}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Categoría"
+                <Text style={styles.dropdownLabel}>Categoría</Text>
+                {/* Aquí se podría poner un Dropdown, pero por simplicidad lo dejo como un TextInput para seleccionar una categoría */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Seleccionar categoría"
                     value={idSelectedCategory}
-                    onChange={(item) => {
-                        idSetSelectedCategory(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
+                    onChangeText={setIdSelectedCategory}
                 />
             </View>
+
+            {/* Dropdown para localidades */}
             <View style={styles.dropdownContainer}>
-                <Dropdown
-                    data={locations}
-                    labelField="name"
-                    valueField="id"
-                    placeholder="Localidad"
+                <Text style={styles.dropdownLabel}>Localidad</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Seleccionar localidad"
                     value={idSelectedLocation}
-                    onChange={(item) => {
-                        setIdSelectedLocation(item.id);
-                    }}
-                    renderItem={(item) => renderItem(item)}
+                    onChangeText={setIdSelectedLocation}
                 />
             </View>
-            <Boton text={"Guardar"} onPress={handleGuardar} />
-            <BotonSecundario style={styles.secundario} text={'Atrás'} onPress={() => navigation.navigate('Index', { token: token, id: idUser})}/>
+
+            {/* Botón Guardar */}
+            <TouchableOpacity style={styles.saveButton} onPress={handleGuardar}>
+                <Text style={styles.saveText}>Guardar</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -121,58 +147,51 @@ export default function Formulario() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#f5f5f5',
         padding: 20,
     },
-    dropdownContainer: {
-        width: '100%',
-        backgroundColor: 'white',
-        borderWidth: 0,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 20,
-        marginTop: 15,
-        shadowColor: '#0060DD',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3, 
-        shadowRadius: 10,
-        elevation: 5,
-        borderColor: 'transparent',
-        fontSize: 16
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333', 
+        color: '#333',
         marginBottom: 20,
     },
-    boton: {
-        backgroundColor: '#4CAF50', 
-        paddingVertical: 15,
-        paddingHorizontal: 30,
+    input: {
+        width: '100%',
+        padding: 10,
+        marginVertical: 10,
+        borderWidth: 1,
         borderRadius: 5,
-        elevation: 3, 
+        borderColor: '#ddd',
+        backgroundColor: '#fff',
+        fontSize: 16,
     },
-    botonText: {
+    dropdownContainer: {
+        width: '100%',
+        marginBottom: 20,
+    },
+    dropdownLabel: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 5,
+    },
+    saveButton: {
+        backgroundColor: '#0060DD',
+        paddingVertical: 15,
+        paddingHorizontal: 60,
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    saveText: {
         color: '#fff',
         fontSize: 18,
-        textAlign: 'center',
-    },
-    item: {
-        padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-        backgroundColor: '#f9f9f9',
-    },
-    itemText: {
-        fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
-    },
-    itemDate: {
-        fontSize: 12,
-        color: '#666',
     },
 });

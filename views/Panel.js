@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
-import Boton from '../components/Boton';
-import BotonSecundario from '../components/BotonSecundario';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getEventos, getAuth, get } from '../authService';
-
+import { Ionicons } from '@expo/vector-icons';  // Para la flecha
+import { getEventos } from '../authService';
 
 export default function Panel() {
     const navigation = useNavigation();
@@ -33,29 +31,55 @@ export default function Panel() {
         fetchData();
     }, []);
 
-
     return (
         <View style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>Próximos Eventos</Text>
             <FlatList
                 data={eventos.filter(isDateFuture)}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.eventContainer}>
-                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', {idEvent: item.id, evento: item, token: token, nombre_user: nombre_user, idUser })}>{item.name}</Text>
+                        <Text
+                            style={styles.eventTitle}
+                            onPress={() => navigation.navigate('DetalleEventoAdmin', {
+                                idEvent: item.id,
+                                evento: item,
+                                token: token,
+                                nombre_user: nombre_user,
+                                idUser
+                            })}
+                        >
+                            {item.name}
+                        </Text>
                         <Text>{item.start_date}</Text>
                     </View>
                 )}
                 contentContainerStyle={styles.listContainer}
                 style={styles.flatList}
             />
+
             <Text style={styles.title}>Eventos pasados</Text>
             <FlatList
                 data={eventos.filter(event => !isDateFuture(event))}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.eventContainer}>
-                        <Text style={styles.eventTitle} onPress={() => navigation.navigate('DetalleEventoAdmin', { idEvent: item.id, evento: item, token: token, idUser, nombre_user })}>{item.name}</Text>
+                        <Text
+                            style={styles.eventTitle}
+                            onPress={() => navigation.navigate('DetalleEventoAdmin', {
+                                idEvent: item.id,
+                                evento: item,
+                                token: token,
+                                nombre_user: nombre_user,
+                                idUser
+                            })}
+                        >
+                            {item.name}
+                        </Text>
                         <Text>{item.start_date}</Text>
                     </View>
                 )}
@@ -72,17 +96,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F9FD',
         padding: 20,
     },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        padding: 10,
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
         marginBottom: 10,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#555',
-        marginBottom: 30,
         textAlign: 'center',
     },
     listContainer: {

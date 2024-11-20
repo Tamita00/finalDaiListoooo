@@ -1,10 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import BotonSecundario from '../components/BotonSecundario';
-import Boton from '../components/Boton';
-import Title from '../components/Title';
 import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
 import { get, deleteAuth } from '../authService';
 
 export default function DetalleEventoAdmin() {
@@ -36,7 +34,6 @@ export default function DetalleEventoAdmin() {
             }
         }
     };
-    
 
     useEffect(() => {
         fetchInscriptos();
@@ -45,7 +42,7 @@ export default function DetalleEventoAdmin() {
     const displayData = {
         'Nombre': evento.name,
         'Descripcion': evento.description,
-        'Categoria': evento.id_event_category || 'Desconocida', // se que solo tira el id de la categoría pero no estoy pudiendo hacer que agarre el nombre
+        'Categoria': evento.id_event_category || 'Desconocida',
         'Localidad': evento.id_event_location || 'Desconocida', 
         'Fecha de inicio': new Date(evento.start_date).toLocaleString(),
         'Duracion': `${evento.duration_in_minutes} minutos`,
@@ -57,7 +54,15 @@ export default function DetalleEventoAdmin() {
 
     return (
         <View style={styles.container}>
-            <Title text={saludo} />
+            {/* Flecha para regresar atrás */}
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back-circle" size={40} color="black" />
+            </TouchableOpacity>
+
+            {/* Título del evento */}
+            <Text style={styles.title}>{saludo}</Text>
+
+            {/* Detalles del evento */}
             <View style={[styles.card, styles.cardData]}>
                 {Object.entries(displayData).map(([key, value]) => (
                     <Text key={key} style={styles.text}>
@@ -65,8 +70,10 @@ export default function DetalleEventoAdmin() {
                     </Text>
                 ))}
             </View>
+
+            {/* Lista de inscriptos */}
             <View style={styles.card}>
-                <h2 style={styles.tituloCard}>Inscriptos</h2>
+                <Text style={styles.tituloCard}>Inscriptos</Text>
                 <FlatList
                     data={inscriptos}
                     keyExtractor={(item) => item.id.toString()}
@@ -79,21 +86,23 @@ export default function DetalleEventoAdmin() {
                     style={styles.flatList}
                 />
             </View>
+
+            {/* Botones de acción */}
             <View style={styles.containerBotones}>
-                <BotonSecundario 
-                    text={'Atrás'} 
-                    onPress={() => navigation.navigate('Index', { token: token, id: idUser })} 
-                />
                 {fechaInicioEvento > fechaActual ? (
                     <>
-                        <Boton 
-                            text={'Editar'} 
-                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, idUser: idUser, eventoAEditar: evento, nombre_user: nombre_user })} 
-                        />
-                        <Boton
-                            text={'Eliminar'}
+                        <TouchableOpacity 
+                            style={styles.button} 
+                            onPress={() => navigation.navigate('Edicion', { idEvent: idEvent, token: token, idUser: idUser, eventoAEditar: evento, nombre_user: nombre_user })}
+                        >
+                            <Text style={styles.buttonText}>Editar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.button} 
                             onPress={eliminarEvento}
-                        />
+                        >
+                            <Text style={styles.buttonText}>Eliminar</Text>
+                        </TouchableOpacity>
                     </>
                 ) : null}
             </View>
@@ -109,12 +118,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        zIndex: 1,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
     containerBotones: {
         flexDirection: 'row',
-        width: '10%',
+        justifyContent: 'space-between',
+        width: '100%',
         maxWidth: 600,
         marginTop: 20,
-        left: -120
     },
     card: {
         width: '100%',
@@ -135,8 +155,9 @@ const styles = StyleSheet.create({
     tituloCard: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 30,
+        fontSize: 24,
         color: 'rgb(16, 137, 211)',
+        marginBottom: 10,
     },
     text: {
         fontSize: 16,
@@ -149,5 +170,17 @@ const styles = StyleSheet.create({
     flatList: {
         maxHeight: '50%',
     },
+    button: {
+        backgroundColor: 'green',
+        paddingVertical: 12,
+        marginHorizontal: 10,
+        borderRadius: 5,
+        flex: 1,
+        alignItems: 'center',
+    },
+    buttonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'white',
+    }
 });
-
