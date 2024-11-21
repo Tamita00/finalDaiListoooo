@@ -110,6 +110,7 @@ export const getCategories = async (credentials) => {
     const response = await api.get('category/', {headers: {
       'Authorization': `Bearer ${credentials}`}
   });
+  console.log(response.data);
     return response.data;
   } catch (error) {
     console.error('Error en la carga de categorías:', error);
@@ -122,6 +123,7 @@ export const getLocations = async (credentials) => {
     const response = await api.get('event-location/', {headers: {
       'Authorization': `Bearer ${credentials}`}
   });
+  console.log(response.data);
     return response.data;
   } catch (error) {
     console.error('Error en la carga de localidades:', error);

@@ -1,8 +1,9 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Picker } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
-import { getCategories, getLocations, postAuth } from '../authService';
+import { getCategories, getLocations } from '../authService';
+import DateTimePicker from '@react-native-community/datetimepicker';  // Importa el DateTimePicker
 
 export default function Formulario() {
     const navigation = useNavigation();
@@ -14,7 +15,8 @@ export default function Formulario() {
     const [duracion, setDuracion] = useState("");
     const [precio, setPrecio] = useState("");
     const [asistenciaMax, setAsistenciaMax] = useState("");
-    const [eventDate, setEventDate] = useState("");
+    const [eventDate, setEventDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const [categories, setCategories] = useState([]);
     const [locations, setLocations] = useState([]);
@@ -25,6 +27,7 @@ export default function Formulario() {
         const fetchCategories = async () => {
             try {
                 const data = await getCategories(token);
+                console.log("lcatoins: "+ data);
                 setCategories(data);
             } catch (error) {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
@@ -34,6 +37,7 @@ export default function Formulario() {
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
+                console.log("lcatoins: "+ data);
                 setLocations(data);
             } catch (error) {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
@@ -44,13 +48,19 @@ export default function Formulario() {
         fetchLocations();
     }, [token]);
 
-    function handleGuardar() {
+    const handleDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || eventDate;
+        setShowDatePicker(false);
+        setEventDate(currentDate);
+    };
+
+    const handleGuardar = () => {
         const eventoACrear = {
             'name': nombre,
             'description': descripcion,
             'id_event_category': idSelectedCategory,
             'id_event_location': idSelectedLocation,
-            'start_date': eventDate,
+            'start_date': eventDate.toISOString(),
             'duration_in_minutes': duracion,
             'price': precio,
             'enabled_for_enrollment': 1,
@@ -66,31 +76,29 @@ export default function Formulario() {
             idUser: idUser,
         });
         console.log(eventoACrear);
-    }
+    };
 
     return (
         <View style={styles.container}>
-            {/* Flecha para regresar */}
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Ionicons name="arrow-back-circle" size={40} color="black" />
-            </TouchableOpacity>
-
-            {/* Título */}
             <Text style={styles.title}>Crear un nuevo evento</Text>
 
-            {/* Campos del formulario */}
+            {/* Nombre */}
             <TextInput
                 style={styles.input}
                 placeholder="Nombre"
                 value={nombre}
                 onChangeText={setNombre}
             />
+
+            {/* Descripción */}
             <TextInput
                 style={styles.input}
                 placeholder="Descripción"
                 value={descripcion}
                 onChangeText={setDescripcion}
             />
+
+            {/* Duración */}
             <TextInput
                 style={styles.input}
                 placeholder="Duración en minutos"
@@ -98,6 +106,8 @@ export default function Formulario() {
                 onChangeText={setDuracion}
                 keyboardType="numeric"
             />
+
+            {/* Precio */}
             <TextInput
                 style={styles.input}
                 placeholder="Precio"
@@ -105,6 +115,8 @@ export default function Formulario() {
                 onChangeText={setPrecio}
                 keyboardType="numeric"
             />
+
+            {/* Asistencia máxima */}
             <TextInput
                 style={styles.input}
                 placeholder="Asistencia máxima"
@@ -113,33 +125,53 @@ export default function Formulario() {
                 keyboardType="numeric"
             />
 
-            {/* Dropdown para categorías */}
-            <View style={styles.dropdownContainer}>
-                <Text style={styles.dropdownLabel}>Categoría</Text>
-                {/* Aquí se podría poner un Dropdown, pero por simplicidad lo dejo como un TextInput para seleccionar una categoría */}
-                <TextInput
-                    style={styles.input}
-                    placeholder="Seleccionar categoría"
-                    value={idSelectedCategory}
-                    onChangeText={setIdSelectedCategory}
+            {/* Selector de fecha */}
+            <Text>Fecha del evento</Text>
+            <Button title="Seleccionar fecha" onPress={() => setShowDatePicker(true)} />
+            {showDatePicker && (
+                <DateTimePicker
+                    value={eventDate}
+                    mode="date"
+                    display="default"
+                    onChange={handleDateChange}
                 />
+            )}
+
+            {/* Categoría */}
+            <View style={styles.dropdownContainer}>
+                <Picker
+                    selectedValue={idSelectedCategory}
+                    onValueChange={setIdSelectedCategory}
+                >
+                    <Picker.Item label="Categoría" value={null} />
+                    {categories.map((category) => (
+                        <Picker.Item key={category.id} label={category.name} value={category.id} />
+                    ))}
+                </Picker>
             </View>
 
-            {/* Dropdown para localidades */}
+            {/* Localidad */}
             <View style={styles.dropdownContainer}>
-                <Text style={styles.dropdownLabel}>Localidad</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Seleccionar localidad"
-                    value={idSelectedLocation}
-                    onChangeText={setIdSelectedLocation}
-                />
+                <Picker
+                    selectedValue={idSelectedLocation}
+                    onValueChange={setIdSelectedLocation}
+                >
+                    <Picker.Item label="Localidad" value={null} />
+                    {locations.map((location) => (
+                        <Picker.Item key={location.id} label={location.name} value={location.id} />
+                    ))}
+                </Picker>
             </View>
 
             {/* Botón Guardar */}
-            <TouchableOpacity style={styles.saveButton} onPress={handleGuardar}>
-                <Text style={styles.saveText}>Guardar</Text>
-            </TouchableOpacity>
+            <Button title="Guardar" onPress={handleGuardar} color="#28a745" />
+
+            {/* Botón Atrás */}
+            <Button
+                title="Atrás"
+                onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
+                color="#28a745"
+            />
         </View>
     );
 }
@@ -151,11 +183,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f5f5f5',
         padding: 20,
-    },
-    backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 20,
     },
     title: {
         fontSize: 24,
@@ -176,22 +203,5 @@ const styles = StyleSheet.create({
     dropdownContainer: {
         width: '100%',
         marginBottom: 20,
-    },
-    dropdownLabel: {
-        fontSize: 16,
-        color: '#333',
-        marginBottom: 5,
-    },
-    saveButton: {
-        backgroundColor: '#0060DD',
-        paddingVertical: 15,
-        paddingHorizontal: 60,
-        borderRadius: 5,
-        marginTop: 20,
-    },
-    saveText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
 });
