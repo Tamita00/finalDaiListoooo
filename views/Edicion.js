@@ -125,7 +125,6 @@ export default function Edicion() {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     saveButton: {
-        backgroundColor: '#0060DD',
+        backgroundColor: '#28a745', // Cambio de azul a verde
         paddingVertical: 15,
         paddingHorizontal: 60,
         borderRadius: 5,

@@ -1,9 +1,9 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, TextInput, Button, Picker } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Picker, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
 import { getCategories, getLocations } from '../authService';
-import DateTimePicker from '@react-native-community/datetimepicker';  // Importa el DateTimePicker
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
 
 export default function Formulario() {
     const navigation = useNavigation();
@@ -27,7 +27,6 @@ export default function Formulario() {
         const fetchCategories = async () => {
             try {
                 const data = await getCategories(token);
-                console.log("lcatoins: "+ data);
                 setCategories(data);
             } catch (error) {
                 console.error('(UseEffect) Error al cargar las categorías:', error);
@@ -37,7 +36,6 @@ export default function Formulario() {
         const fetchLocations = async () => {
             try {
                 const data = await getLocations(token);
-                console.log("lcatoins: "+ data);
                 setLocations(data);
             } catch (error) {
                 console.error('(UseEffect) Error al cargar las localidades:', error);
@@ -50,7 +48,7 @@ export default function Formulario() {
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || eventDate;
-        setShowDatePicker(false);
+        setShowDatePicker(false);  // Ocultar el picker después de seleccionar
         setEventDate(currentDate);
     };
 
@@ -75,59 +73,25 @@ export default function Formulario() {
             nombre_user: nombre_user,
             idUser: idUser,
         });
-        console.log(eventoACrear);
     };
 
     return (
         <View style={styles.container}>
+            
+            {/* Flecha para regresar atrás */}
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back-circle" size={40} color="black" />
+            </TouchableOpacity>
+            
             <Text style={styles.title}>Crear un nuevo evento</Text>
+            
+            {/* Mostrar la fecha seleccionada */}
+            <Text>Fecha seleccionada: {eventDate.toLocaleDateString()}</Text>
 
-            {/* Nombre */}
-            <TextInput
-                style={styles.input}
-                placeholder="Nombre"
-                value={nombre}
-                onChangeText={setNombre}
-            />
-
-            {/* Descripción */}
-            <TextInput
-                style={styles.input}
-                placeholder="Descripción"
-                value={descripcion}
-                onChangeText={setDescripcion}
-            />
-
-            {/* Duración */}
-            <TextInput
-                style={styles.input}
-                placeholder="Duración en minutos"
-                value={duracion}
-                onChangeText={setDuracion}
-                keyboardType="numeric"
-            />
-
-            {/* Precio */}
-            <TextInput
-                style={styles.input}
-                placeholder="Precio"
-                value={precio}
-                onChangeText={setPrecio}
-                keyboardType="numeric"
-            />
-
-            {/* Asistencia máxima */}
-            <TextInput
-                style={styles.input}
-                placeholder="Asistencia máxima"
-                value={asistenciaMax}
-                onChangeText={setAsistenciaMax}
-                keyboardType="numeric"
-            />
-
-            {/* Selector de fecha */}
-            <Text>Fecha del evento</Text>
+            {/* Botón para mostrar el selector de fecha */}
             <Button title="Seleccionar fecha" onPress={() => setShowDatePicker(true)} />
+            
+            {/* Mostrar DateTimePicker si el estado showDatePicker es true */}
             {showDatePicker && (
                 <DateTimePicker
                     value={eventDate}
@@ -137,12 +101,15 @@ export default function Formulario() {
                 />
             )}
 
-            {/* Categoría */}
+            {/* Otros campos de entrada */}
+            <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
+            <TextInput style={styles.input} placeholder="Descripción" value={descripcion} onChangeText={setDescripcion} />
+            <TextInput style={styles.input} placeholder="Duración en minutos" value={duracion} onChangeText={setDuracion} keyboardType="numeric" />
+            <TextInput style={styles.input} placeholder="Precio" value={precio} onChangeText={setPrecio} keyboardType="numeric" />
+            <TextInput style={styles.input} placeholder="Asistencia máxima" value={asistenciaMax} onChangeText={setAsistenciaMax} keyboardType="numeric" />
+            
             <View style={styles.dropdownContainer}>
-                <Picker
-                    selectedValue={idSelectedCategory}
-                    onValueChange={setIdSelectedCategory}
-                >
+                <Picker selectedValue={idSelectedCategory} onValueChange={setIdSelectedCategory}>
                     <Picker.Item label="Categoría" value={null} />
                     {categories.map((category) => (
                         <Picker.Item key={category.id} label={category.name} value={category.id} />
@@ -150,12 +117,8 @@ export default function Formulario() {
                 </Picker>
             </View>
 
-            {/* Localidad */}
             <View style={styles.dropdownContainer}>
-                <Picker
-                    selectedValue={idSelectedLocation}
-                    onValueChange={setIdSelectedLocation}
-                >
+                <Picker selectedValue={idSelectedLocation} onValueChange={setIdSelectedLocation}>
                     <Picker.Item label="Localidad" value={null} />
                     {locations.map((location) => (
                         <Picker.Item key={location.id} label={location.name} value={location.id} />
@@ -163,18 +126,11 @@ export default function Formulario() {
                 </Picker>
             </View>
 
-            {/* Botón Guardar */}
             <Button title="Guardar" onPress={handleGuardar} color="#28a745" />
-
-            {/* Botón Atrás */}
-            <Button
-                title="Atrás"
-                onPress={() => navigation.navigate('Index', { token: token, id: idUser })}
-                color="#28a745"
-            />
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -203,5 +159,11 @@ const styles = StyleSheet.create({
     dropdownContainer: {
         width: '100%',
         marginBottom: 20,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        padding: 10,
     },
 });

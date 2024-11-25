@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { postAuth } from './../authService';
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Para usar íconos de la flecha
+import { Ionicons } from '@expo/vector-icons'; // Para la flecha de atrás
 
 export default function Confirmacion() {
     const navigation = useNavigation();
